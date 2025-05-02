@@ -474,15 +474,17 @@ void ST7789_WriteChar(uint16_t x, uint16_t y, char ch, FontDef font, uint16_t co
 void ST7789_WriteString(uint16_t x, uint16_t y, const char *str, FontDef font, uint16_t color, uint16_t bgcolor)
 {
 	ST7789_Select();
+	const start_x = x;
 	while (*str) {
-		if (x + font.width >= ST7789_WIDTH) {
-			x = 0;
+		if (x + font.width >= ST7789_WIDTH
+				|| *str == '\n') {
+			x = start_x;
 			y += font.height;
 			if (y + font.height >= ST7789_HEIGHT) {
 				break;
 			}
 
-			if (*str == ' ') {
+			if (*str == ' ' || *str == '\n') {
 				// skip spaces in the beginning of the new line
 				str++;
 				continue;

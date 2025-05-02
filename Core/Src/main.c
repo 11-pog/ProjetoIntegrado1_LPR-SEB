@@ -26,6 +26,7 @@
 #include "ST7789/images.h"
 #include "ST7789/st7789.h"
 #include "stdbool.h"
+#include "stdio.h"
 #include <string.h>
 
 /* USER CODE END Includes */
@@ -56,8 +57,7 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
-char WaitForButton(uint16_t Buttons[]);
-void Menu(void);
+// Obrigatório
 void IniciarJogo(void);
 void GerarParesAleatorios(void);
 void NavegarCursor(void);
@@ -67,8 +67,28 @@ void VerificarFimDeJogo(void);
 void AtualizarTentativas(void);
 int AtualizarRecorde(void);
 void ExibirFimDeJogo(void);
-void AwaitForAnyButton(void);
 
+// Button Detection
+void AwaitForAnyButton(void);
+char DetectButtonPress(uint16_t Buttons[]);
+
+// Pokemon
+char mander(void);
+char meleon(void);
+char izard(void);
+char cadet(void);
+int elion(void);
+float zel(void);
+
+
+// que(rosene)
+bool AAAAAAAA(void);
+int ernet(void);
+
+// Screens
+void Menu(void);
+void PrintSelectDifficulty(void);
+void SelectDifficulty(void);
 
 /* USER CODE END PFP */
 
@@ -85,7 +105,6 @@ void AwaitForAnyButton(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
 
   /* USER CODE END 1 */
 
@@ -110,14 +129,15 @@ int main(void)
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
   ST7789_Init();
-Menu();
+  Menu();
+  AwaitForAnyButton();
+  SelectDifficulty();
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-AwaitForAnyButton();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -214,11 +234,10 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOA, ST7789_CS_Pin|GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11
-                          |GPIO_PIN_12, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(ST7789_CS_GPIO_Port, ST7789_CS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, ST7789_DC_Pin|ST7789_RST_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, ST7789_DC_Pin|ST7789_RST_Pin|GPIO_PIN_3, GPIO_PIN_RESET);
 
   /*Configure GPIO pin : ST7789_CS_Pin */
   GPIO_InitStruct.Pin = ST7789_CS_Pin;
@@ -227,8 +246,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(ST7789_CS_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : ST7789_DC_Pin ST7789_RST_Pin */
-  GPIO_InitStruct.Pin = ST7789_DC_Pin|ST7789_RST_Pin;
+  /*Configure GPIO pins : ST7789_DC_Pin ST7789_RST_Pin PB3 */
+  GPIO_InitStruct.Pin = ST7789_DC_Pin|ST7789_RST_Pin|GPIO_PIN_3;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -236,9 +255,8 @@ static void MX_GPIO_Init(void)
 
   /*Configure GPIO pins : PA9 PA10 PA11 PA12 */
   GPIO_InitStruct.Pin = GPIO_PIN_9|GPIO_PIN_10|GPIO_PIN_11|GPIO_PIN_12;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
   GPIO_InitStruct.Pull = GPIO_PULLUP;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
 }
@@ -249,45 +267,48 @@ void Menu(){
 	ST7789_WriteString(90, 60, "MENU", Font_16x26, WHITE, BLACK);
 	ST7789_WriteString(60, 120, "New Game", Font_11x18, WHITE, BLACK);
 	char * result;
-	sprintf(result, "Record: %i",record);
+	sprintf(result, "Record: %i", record);
 	ST7789_WriteString(60, 140, result, Font_11x18, WHITE, BLACK);
 
-	ST7789_WriteString(10, 160, "Pressione qualquer botao", Font_7x10, WHITE, BLACK);
-	ST7789_WriteString(40, 180, "Pra comecar", Font_7x10, WHITE, BLACK);
+	ST7789_WriteString(36, 180, "Pressione qualquer botao", Font_7x10, WHITE, BLACK);
+	ST7789_WriteString(82, 190, "Pra comecar", Font_7x10, WHITE, BLACK);
+}
+void PrintSelectDifficulty(char SelectedColor = 0){
+	ST7789_Fill_Color(BLACK);
+	ST7789_WriteString(20, 30, "Selecione uma\ndificuldade:", Font_11x18, WHITE, BLACK);
 
-	AwaitForAnyButton();
-
-
-
-	/*switch (WaitForButton()){
+	switch (SelectedColor) {
+		case 0:
+			ST7789_WriteString(10, 120, "- 4x4", Font_11x18, WHITE, BLACK);
+			ST7789_WriteString(10, 140, "- 6x6", Font_11x18, WHITE, BLACK);
+			break;
 		case 1:
-
+			ST7789_WriteString(10, 120, "- 4x4", Font_11x18, YELLOW, BLACK);
+			ST7789_WriteString(10, 140, "- 6x6", Font_11x18, WHITE, BLACK);
+			break;
+		case 2:
+			ST7789_WriteString(10, 120, "- 4x4", Font_11x18, WHITE, BLACK);
+			ST7789_WriteString(10, 140, "- 6x6", Font_11x18, YELLOW, BLACK);
 			break;
 		default:
 			break;
 	}
 
-*/
 }
-void SelectDificulty(){
+void SelectDifficulty(void){
+	PrintSelectDifficulty(0);
+
 
 }
 void AwaitForAnyButton(void)
 {
-	char hsdg= HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9 );
-
-	while  (hsdg != 0 &&
+	while  (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9 ) != 0 &&
 			HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10) != 0 &&
 			HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_11) != 0 &&
 			HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_12) != 0);
 	{
 	}
-	ST7789_WriteString(40, 200, "sim", Font_7x10, WHITE, BLACK);
 }
-
-/*char WaitForButton(){
-bool botao;
-}*/
 
 void IniciarJogo(void){
 
@@ -295,7 +316,6 @@ void IniciarJogo(void){
 void GerarParesAleatorios(void){
 
 }
-
 void NavegarCursor(void){
 
 }
@@ -317,16 +337,8 @@ int AtualizarRecorde(void){
 void ExibirFimDeJogo(void){
 
 }
-
-
-
-
-char WaitForButton(uint16_t Buttons[]){
+char DetectButtonPress(uint16_t Buttons[]){
 	bool botao;
-
-
-
-
 }
 /* USER CODE END 4 */
 

@@ -14,10 +14,10 @@ st7789.c:363:6:ST7789_DrawCircle	40	static
 st7789.c:407:6:ST7789_DrawImage	24	static
 st7789.c:427:6:ST7789_InvertColors	16	static
 st7789.c:443:6:ST7789_WriteChar	48	static
-st7789.c:474:6:ST7789_WriteString	32	static
-st7789.c:505:6:ST7789_DrawFilledRectangle	40	static
-st7789.c:539:6:ST7789_DrawTriangle	32	static
-st7789.c:555:6:ST7789_DrawFilledTriangle	64	static
-st7789.c:624:6:ST7789_DrawFilledCircle	48	static
-st7789.c:664:6:ST7789_TearEffect	16	static
-st7789.c:677:6:ST7789_Test	24	static
+st7789.c:474:6:ST7789_WriteString	40	static
+st7789.c:507:6:ST7789_DrawFilledRectangle	40	static
+st7789.c:541:6:ST7789_DrawTriangle	32	static
+st7789.c:557:6:ST7789_DrawFilledTriangle	64	static
+st7789.c:626:6:ST7789_DrawFilledCircle	48	static
+st7789.c:666:6:ST7789_TearEffect	16	static
+st7789.c:679:6:ST7789_Test	24	static
