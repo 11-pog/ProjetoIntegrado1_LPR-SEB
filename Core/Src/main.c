@@ -76,8 +76,10 @@ void DetectButtonPress(const char buttons[], char *out, size_t amount);
 
 // Screens
 void Menu(void);
-void PrintSelectDifficulty(char SelectedColor);
+void PrintSelectDifficulty(char selection);
 void SelectDifficulty(void);
+void PrintSelectMode(char selection);
+void SelectMode(void);
 
 // Other/Util
 char Contain(char *Iterable, size_t size, char Contains);
@@ -134,14 +136,15 @@ int main(void) {
 	Menu();
 	AwaitForAnyButton();
 	SelectDifficulty();
+	SelectMode();
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
 		char Buttons[3];
-		const char toPress[3] = {10, 11, 12};
-		DetectButtonPress((char *)toPress, Buttons, 3);
+		const char toPress[3] = { 10, 11, 12 };
+		DetectButtonPress((char*) toPress, Buttons, 3);
 		HAL_Delay(1);
 		/* USER CODE END WHILE */
 
@@ -274,12 +277,12 @@ void Menu() {
 	BLACK);
 	ST7789_WriteString(82, 190, "Pra comecar", Font_7x10, WHITE, BLACK);
 }
-void PrintSelectDifficulty(char SelectedColor) {
+void PrintSelectDifficulty(char selection) {
 	ST7789_Fill_Color(BLACK);
 	ST7789_WriteString(20, 30, "Selecione uma\ndificuldade:", Font_11x18, WHITE,
 	BLACK);
 
-	switch (SelectedColor) {
+	switch (selection) {
 	case 0:
 		ST7789_WriteString(10, 120, "- 4x4", Font_11x18, WHITE, BLACK);
 		ST7789_WriteString(10, 140, "- 6x6", Font_11x18, WHITE, BLACK);
@@ -295,11 +298,40 @@ void PrintSelectDifficulty(char SelectedColor) {
 	default:
 		break;
 	}
-
 }
 void SelectDifficulty(void) {
 	PrintSelectDifficulty(0);
 
+	char btns[3];
+	const char UsingBtns[3] = { 10, 11, 12 };
+
+	unsigned int selection = 1;
+
+	while (1) {
+		DetectButtonPress((char* )UsingBtns, btns, 3);
+
+		if (btns[1] == 0)
+		{
+			break;
+		}
+
+		if (btns[0] == 0 || btns[2] == 0)
+		{
+			selection++;
+			selection %= 2;
+		}
+
+		PrintSelectDifficulty(selection + 1);
+	}
+
+}
+void PrintSelectMode(char selection)
+{
+	ST7789_Fill_Color(BLACK);
+}
+void SelectMode(void)
+{
+	PrintSelectMode(0);
 }
 
 void IniciarJogo(void) {
@@ -373,9 +405,9 @@ void DetectButtonPress(const char buttons[], char *out, size_t amount) {
 
 		char outIndex = 0;
 		for (int i = 0; i < 4; i++) {
-			if (Contain(buttons, amount, i+9))
-			{
-				if (btnValues[i] == 0) end = 1;
+			if (Contain(buttons, amount, i + 9)) {
+				if (btnValues[i] == 0)
+					end = 1;
 				out[outIndex] = btnValues[i];
 				outIndex++;
 			}
@@ -413,7 +445,7 @@ void Error_Handler(void) {
   * @param  file: pointer to the source file name
   * @param  line: assert_param error line source number
   * @retval None
-  */
+  */-
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
