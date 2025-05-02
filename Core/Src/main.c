@@ -72,7 +72,7 @@ void ExibirFimDeJogo(void);
 void AwaitForAnyButton(void);
 void ReadButtons(char *out);
 void DetectAnyButtonPress(char *out);
-void DetectButtonPress(uint16_t buttons[], char *out);
+void DetectButtonPress(const char buttons[], char *out, size_t amount);
 
 // Screens
 void Menu(void);
@@ -80,7 +80,7 @@ void PrintSelectDifficulty(char SelectedColor);
 void SelectDifficulty(void);
 
 // Other/Util
-char Contain(char *Iterable, char Contains);
+char Contain(char *Iterable, size_t size, char Contains);
 
 // Pokemon
 char mander(void);
@@ -139,8 +139,9 @@ int main(void) {
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
-		char Buttons[4];
-		DetectAnyButtonPress(Buttons);
+		char Buttons[3];
+		const char toPress[3] = {10, 11, 12};
+		DetectButtonPress((char *)toPress, Buttons, 3);
 		HAL_Delay(1);
 		/* USER CODE END WHILE */
 
@@ -339,7 +340,7 @@ void AwaitForAnyButton(void) {
 
 	do {
 		ReadButtons(buttons);
-	} while (!Contain(buttons, 0));
+	} while (!Contain(buttons, 4, 0));
 }
 void DetectAnyButtonPress(char *out) {
 	char buttons[4];
@@ -351,7 +352,7 @@ void DetectAnyButtonPress(char *out) {
 
 	do {
 		ReadButtons(buttons);
-	} while (!Contain(buttons, 0));
+	} while (!Contain(buttons, 4, 0));
 
 	btnPressTime = HAL_GetTick();
 
@@ -364,13 +365,26 @@ void DetectAnyButtonPress(char *out) {
 		ReadButtons(buttons);
 	} while (time < 100);
 }
-void DetectButtonPress(uint16_t buttons[], char *out) {
-	bool botao;
+void DetectButtonPress(const char buttons[], char *out, size_t amount) {
+	char btnValues[4];
+	char end = 0;
+	do {
+		DetectAnyButtonPress(btnValues);
+
+		char outIndex = 0;
+		for (int i = 0; i < 4; i++) {
+			if (Contain(buttons, amount, i+9))
+			{
+				if (btnValues[i] == 0) end = 1;
+				out[outIndex] = btnValues[i];
+				outIndex++;
+			}
+		}
+	} while (end == 0);
 }
 
-char Contain(char *Iterable, char Contains) {
-	int IterSize = sizeof(Iterable) / sizeof(char);
-	for (int i = 0; i < IterSize; i++) {
+char Contain(char *Iterable, size_t size, char Contains) {
+	for (int i = 0; i < size; i++) {
 		if (Iterable[i] == Contains) {
 			return 1;
 		}
