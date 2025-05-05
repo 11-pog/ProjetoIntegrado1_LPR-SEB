@@ -1,0 +1,11 @@
+Funcoes.c:3:6:Menu	48	static
+Funcoes.c:16:6:PrintSelectDifficulty	32	static
+Funcoes.c:34:6:SelectDifficulty	16	static
+Funcoes.c:57:6:PrintSelectMode	32	static
+Funcoes.c:73:6:SelectMode	16	static
+Funcoes.c:95:6:ReadButtons	24	static
+Funcoes.c:102:6:AwaitForAnyButton	16	static
+Funcoes.c:110:6:DetectAnyButtonPress	32	static
+Funcoes.c:131:6:DetectButtonPress	40	static
+Funcoes.c:150:6:Contains	32	static
+Funcoes.c:161:6:ContainsVector2	40	static

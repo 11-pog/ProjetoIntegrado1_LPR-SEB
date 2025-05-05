@@ -1,5 +1,9 @@
-Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
- ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h \
+Core/Src/StarCode_O_despertarDaFuncao/Funcoes.o: \
+ ../Core/Src/StarCode_O_despertarDaFuncao/Funcoes.c \
+ ../Core/Src/StarCode_O_despertarDaFuncao/Funcoes.h \
+ ../Core/Src/StarCode_O_despertarDaFuncao/../ST7789/st7789.h \
+ ../Core/Src/StarCode_O_despertarDaFuncao/../ST7789/fonts.h \
+ ../Core/Inc/main.h ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h \
  ../Core/Inc/stm32f1xx_hal_conf.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_rcc.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_def.h \
@@ -21,13 +25,13 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_flash_ex.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h \
- ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h \
- ../Core/Src/ST7789/fonts.h ../Core/Src/ST7789/images.h \
- ../Core/Src/ST7789/st7789.h ../Core/Src/ST7789/fonts.h \
- ../Core/Src/StarCode_O_despertarDaFuncao/FuncoeszinhasDoSirAndery.h \
- ../Core/Src/StarCode_O_despertarDaFuncao/Funcoes.h \
- ../Core/Src/StarCode_O_despertarDaFuncao/../ST7789/st7789.h \
- ../Core/Src/StarCode_O_despertarDaFuncao/Funcoes.h
+ ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h
+
+../Core/Src/StarCode_O_despertarDaFuncao/Funcoes.h:
+
+../Core/Src/StarCode_O_despertarDaFuncao/../ST7789/st7789.h:
+
+../Core/Src/StarCode_O_despertarDaFuncao/../ST7789/fonts.h:
 
 ../Core/Inc/main.h:
 
@@ -76,19 +80,3 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h:
 
 ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h:
-
-../Core/Src/ST7789/fonts.h:
-
-../Core/Src/ST7789/images.h:
-
-../Core/Src/ST7789/st7789.h:
-
-../Core/Src/ST7789/fonts.h:
-
-../Core/Src/StarCode_O_despertarDaFuncao/FuncoeszinhasDoSirAndery.h:
-
-../Core/Src/StarCode_O_despertarDaFuncao/Funcoes.h:
-
-../Core/Src/StarCode_O_despertarDaFuncao/../ST7789/st7789.h:
-
-../Core/Src/StarCode_O_despertarDaFuncao/Funcoes.h:

@@ -30,6 +30,7 @@
 #include "stdio.h"
 
 #include "StarCode_O_despertarDaFuncao/FuncoeszinhasDoSirAndery.h"
+#include "StarCode_O_despertarDaFuncao/Funcoes.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -39,14 +40,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define SIZE4X4 0;
-#define SIZE6X6 1;
-
-#define SINGLEPLAYER 0;
-#define MULTIPLAYER 1;
-
-#define PRESSED 0;
-#define NOTPRESSED 1;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -59,7 +52,6 @@ SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
 int record = 0;
-char *CardField;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -67,35 +59,6 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
-
-
-// Button Detection
-void AwaitForAnyButton(void);
-void ReadButtons(char *out);
-void DetectAnyButtonPress(char *out);
-void DetectButtonPress(char buttons[], char *out, size_t amount);
-
-// Screens
-void Menu(void);
-void PrintSelectDifficulty(char selection);
-char SelectDifficulty(void);
-void PrintSelectMode(char selection);
-char SelectMode(void);
-
-// Other/Util
-char Contains(char *Iterable, size_t size, char Contains);
-
-// Pokemon
-char mander(void);
-char meleon(void);
-char izard(void);
-char cadet(void);
-int elion(void);
-float zel(void);
-
-// que(rosene)
-bool AAAAAAAA(void);
-int ernet(void);
 
 /* USER CODE END PFP */
 
@@ -134,20 +97,37 @@ int main(void) {
 	MX_SPI1_Init();
 	/* USER CODE BEGIN 2 */
 	ST7789_Init();
-	Menu();
+
+	Menu(record);
 	AwaitForAnyButton();
+
 	char difficulty = SelectDifficulty();
 	char playerMode = SelectMode();
+
 	ST7789_Fill_Color(BLACK);
+
+	const char Size = CalcSize(difficulty);
+
+	char CardField[Size][Size][2];
+	GerarParesAleatorios(CalcSize(difficulty), CardField);
+
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
-		char Buttons[3];
-		const char toPress[3] = { 10, 11, 12 };
-		DetectButtonPress((char*) toPress, Buttons, 3);
-		HAL_Delay(1);
+		for(int i = 0; i<Size;i++)
+		{
+			for(int j = 0; j < Size; j++)
+			{
+				char ToWrite[2];
+				sprintf(ToWrite, "%i", CardField[i][j][0]);
+
+				ST7789_WriteString(i*12, j*20, ToWrite, Font_11x18, WHITE, BLACK);
+			}
+		}
+
+		HAL_Delay(4000);
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
@@ -268,160 +248,6 @@ static void MX_GPIO_Init(void) {
 
 /* USER CODE BEGIN 4 */
 
-void Menu() {
-	ST7789_WriteString(90, 60, "MENU", Font_16x26, WHITE, BLACK);
-	ST7789_WriteString(60, 120, "New Game", Font_11x18, WHITE, BLACK);
-
-	char result[11];
-	sprintf(result, "Record: %i", record);
-	ST7789_WriteString(60, 140, result, Font_11x18, WHITE, BLACK);
-
-	ST7789_WriteString(36, 180, "Pressione qualquer botao", Font_7x10, WHITE,
-	BLACK);
-	ST7789_WriteString(82, 190, "Pra comecar", Font_7x10, WHITE, BLACK);
-}
-void PrintSelectDifficulty(char selection) {
-	ST7789_WriteString(20, 30, "Selecione uma\ndificuldade:", Font_11x18, WHITE,
-	BLACK);
-
-	switch (selection) {
-	case 0:
-		ST7789_WriteString(10, 120, "- 4x4", Font_11x18, YELLOW, BLACK);
-		ST7789_WriteString(10, 140, "- 6x6", Font_11x18, WHITE, BLACK);
-		break;
-	case 1:
-		ST7789_WriteString(10, 120, "- 4x4", Font_11x18, WHITE, BLACK);
-		ST7789_WriteString(10, 140, "- 6x6", Font_11x18, YELLOW, BLACK);
-		break;
-	default:
-		break;
-	}
-}
-char SelectDifficulty(void) {
-	ST7789_Fill_Color(BLACK);
-	PrintSelectDifficulty(0);
-
-	char btns[3];
-	const char UsingBtns[3] = { 10, 11, 12 };
-
-	char selection = SIZE4X4;
-
-	do {
-		DetectButtonPress((char* )UsingBtns, btns, 3);
-
-		if (btns[0] == 0 || btns[2] == 0)
-		{
-			selection++;
-			selection %= 2;
-		}
-
-		PrintSelectDifficulty(selection);
-	} while(btns[1] != 0);
-
-	return selection;
-}
-void PrintSelectMode(char selection)
-{
-	ST7789_WriteString(20, 30, "Modo de Jogo: ", Font_11x18, WHITE, BLACK);
-	switch (selection) {
-		case 0:
-			ST7789_WriteString(10, 120, "Singleplayer", Font_11x18, YELLOW, BLACK);
-			ST7789_WriteString(10, 140, "Multiplayer", Font_11x18, WHITE, BLACK);
-			break;
-		case 1:
-			ST7789_WriteString(10, 120, "Singleplayer", Font_11x18, WHITE, BLACK);
-			ST7789_WriteString(10, 140, "Multiplayer", Font_11x18, YELLOW, BLACK);
-			break;
-		default:
-			break;
-		}
-}
-char SelectMode(void)
-{
-	ST7789_Fill_Color(BLACK);
-	PrintSelectMode(0);
-	char btns[3];
-		const char UsingBtns[3] = { 10, 11, 12 };
-
-		char selection = SINGLEPLAYER;
-
-		do {
-			DetectButtonPress((char* )UsingBtns, btns, 3);
-
-			if (btns[0] == 0 || btns[2] == 0)
-			{
-				selection++;
-				selection %= 2;
-			}
-
-			PrintSelectMode(selection);
-		} while(btns[1] != 0);
-
-		return selection;
-}
-
-void ReadButtons(char *out) {
-	out[0] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9);
-	out[1] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10);
-	out[2] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_11);
-	out[3] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_12);
-}
-
-void AwaitForAnyButton(void) {
-	char buttons[4];
-
-	do {
-		ReadButtons(buttons);
-	} while (!Contains(buttons, 4, 0));
-}
-
-void DetectAnyButtonPress(char *out) {
-	char buttons[4];
-
-	for (int i = 0; i < 4; ++i)
-		out[i] = 1;
-
-	do {
-		ReadButtons(buttons);
-	} while (!Contains(buttons, 4, 0));
-
-	long btnPressTime = HAL_GetTick();
-
-	do {
-		for (int i = 0; i < 4; ++i)
-			if (out[i] == 1)
-				out[i] = buttons[i];
-
-		ReadButtons(buttons);
-	} while (HAL_GetTick() - btnPressTime < 100);
-}
-void DetectButtonPress(char buttons[], char *out, size_t amount) {
-	char btnValues[4];
-	char end = 0;
-	do {
-		DetectAnyButtonPress(btnValues);
-
-		char outIndex = 0;
-		for (int i = 0; i < 4; i++) {
-			if (Contains(buttons, amount, i + 9)) {
-				char aux = NOTPRESSED;
-				if (btnValues[i] == aux)
-					end = 1;
-				out[outIndex] = btnValues[i];
-				outIndex++;
-			}
-		}
-	} while (end == 0);
-}
-
-char Contains(char *Iterable, size_t size, char Contains) {
-	for (int i = 0; i < size; i++) {
-		if (Iterable[i] == Contains) {
-			return 1;
-		}
-	}
-	return 0;
-}
 /* USER CODE END 4 */
 
 /**
