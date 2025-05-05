@@ -23,7 +23,8 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_pwr.h \
  ../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal_spi.h \
  ../Core/Src/ST7789/fonts.h ../Core/Src/ST7789/images.h \
- ../Core/Src/ST7789/st7789.h ../Core/Src/ST7789/fonts.h
+ ../Core/Src/ST7789/st7789.h ../Core/Src/ST7789/fonts.h \
+ ../Core/Src/StarCode_O_despertarDaFuncao/FuncoeszinhasDoSirAndery.h
 
 ../Core/Inc/main.h:
 
@@ -80,3 +81,5 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Core/Src/ST7789/st7789.h:
 
 ../Core/Src/ST7789/fonts.h:
+
+../Core/Src/StarCode_O_despertarDaFuncao/FuncoeszinhasDoSirAndery.h:

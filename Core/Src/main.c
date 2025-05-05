@@ -22,13 +22,14 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include <string.h>
 #include "ST7789/fonts.h"
 #include "ST7789/images.h"
 #include "ST7789/st7789.h"
 #include "stdbool.h"
 #include "stdio.h"
-#include <string.h>
 
+#include "StarCode_O_despertarDaFuncao/FuncoeszinhasDoSirAndery.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -38,6 +39,14 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define SIZE4X4 0;
+#define SIZE6X6 1;
+
+#define SINGLEPLAYER 0;
+#define MULTIPLAYER 1;
+
+#define PRESSED 0;
+#define NOTPRESSED 1;
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -50,6 +59,7 @@ SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
 int record = 0;
+char *CardField;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -57,32 +67,23 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_SPI1_Init(void);
 /* USER CODE BEGIN PFP */
-// Obrigatório
-void IniciarJogo(void);
-void GerarParesAleatorios(void);
-void NavegarCursor(void);
-void SelecionarCarta(void);
-void CompararPares(void);
-void VerificarFimDeJogo(void);
-void AtualizarTentativas(void);
-int AtualizarRecorde(void);
-void ExibirFimDeJogo(void);
+
 
 // Button Detection
 void AwaitForAnyButton(void);
 void ReadButtons(char *out);
 void DetectAnyButtonPress(char *out);
-void DetectButtonPress(const char buttons[], char *out, size_t amount);
+void DetectButtonPress(char buttons[], char *out, size_t amount);
 
 // Screens
 void Menu(void);
 void PrintSelectDifficulty(char selection);
-void SelectDifficulty(void);
+char SelectDifficulty(void);
 void PrintSelectMode(char selection);
-void SelectMode(void);
+char SelectMode(void);
 
 // Other/Util
-char Contain(char *Iterable, size_t size, char Contains);
+char Contains(char *Iterable, size_t size, char Contains);
 
 // Pokemon
 char mander(void);
@@ -135,8 +136,9 @@ int main(void) {
 	ST7789_Init();
 	Menu();
 	AwaitForAnyButton();
-	SelectDifficulty();
-	SelectMode();
+	char difficulty = SelectDifficulty();
+	char playerMode = SelectMode();
+	ST7789_Fill_Color(BLACK);
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -269,7 +271,8 @@ static void MX_GPIO_Init(void) {
 void Menu() {
 	ST7789_WriteString(90, 60, "MENU", Font_16x26, WHITE, BLACK);
 	ST7789_WriteString(60, 120, "New Game", Font_11x18, WHITE, BLACK);
-	char *result;
+
+	char result[11];
 	sprintf(result, "Record: %i", record);
 	ST7789_WriteString(60, 140, result, Font_11x18, WHITE, BLACK);
 
@@ -278,20 +281,15 @@ void Menu() {
 	ST7789_WriteString(82, 190, "Pra comecar", Font_7x10, WHITE, BLACK);
 }
 void PrintSelectDifficulty(char selection) {
-	ST7789_Fill_Color(BLACK);
 	ST7789_WriteString(20, 30, "Selecione uma\ndificuldade:", Font_11x18, WHITE,
 	BLACK);
 
 	switch (selection) {
 	case 0:
-		ST7789_WriteString(10, 120, "- 4x4", Font_11x18, WHITE, BLACK);
-		ST7789_WriteString(10, 140, "- 6x6", Font_11x18, WHITE, BLACK);
-		break;
-	case 1:
 		ST7789_WriteString(10, 120, "- 4x4", Font_11x18, YELLOW, BLACK);
 		ST7789_WriteString(10, 140, "- 6x6", Font_11x18, WHITE, BLACK);
 		break;
-	case 2:
+	case 1:
 		ST7789_WriteString(10, 120, "- 4x4", Font_11x18, WHITE, BLACK);
 		ST7789_WriteString(10, 140, "- 6x6", Font_11x18, YELLOW, BLACK);
 		break;
@@ -299,21 +297,17 @@ void PrintSelectDifficulty(char selection) {
 		break;
 	}
 }
-void SelectDifficulty(void) {
+char SelectDifficulty(void) {
+	ST7789_Fill_Color(BLACK);
 	PrintSelectDifficulty(0);
 
 	char btns[3];
 	const char UsingBtns[3] = { 10, 11, 12 };
 
-	unsigned int selection = 1;
+	char selection = SIZE4X4;
 
-	while (1) {
+	do {
 		DetectButtonPress((char* )UsingBtns, btns, 3);
-
-		if (btns[1] == 0)
-		{
-			break;
-		}
 
 		if (btns[0] == 0 || btns[2] == 0)
 		{
@@ -321,83 +315,87 @@ void SelectDifficulty(void) {
 			selection %= 2;
 		}
 
-		PrintSelectDifficulty(selection + 1);
-	}
+		PrintSelectDifficulty(selection);
+	} while(btns[1] != 0);
 
+	return selection;
 }
 void PrintSelectMode(char selection)
 {
-	ST7789_Fill_Color(BLACK);
+	ST7789_WriteString(20, 30, "Modo de Jogo: ", Font_11x18, WHITE, BLACK);
+	switch (selection) {
+		case 0:
+			ST7789_WriteString(10, 120, "Singleplayer", Font_11x18, YELLOW, BLACK);
+			ST7789_WriteString(10, 140, "Multiplayer", Font_11x18, WHITE, BLACK);
+			break;
+		case 1:
+			ST7789_WriteString(10, 120, "Singleplayer", Font_11x18, WHITE, BLACK);
+			ST7789_WriteString(10, 140, "Multiplayer", Font_11x18, YELLOW, BLACK);
+			break;
+		default:
+			break;
+		}
 }
-void SelectMode(void)
+char SelectMode(void)
 {
+	ST7789_Fill_Color(BLACK);
 	PrintSelectMode(0);
+	char btns[3];
+		const char UsingBtns[3] = { 10, 11, 12 };
+
+		char selection = SINGLEPLAYER;
+
+		do {
+			DetectButtonPress((char* )UsingBtns, btns, 3);
+
+			if (btns[0] == 0 || btns[2] == 0)
+			{
+				selection++;
+				selection %= 2;
+			}
+
+			PrintSelectMode(selection);
+		} while(btns[1] != 0);
+
+		return selection;
 }
 
-void IniciarJogo(void) {
-
-}
-void GerarParesAleatorios(void) {
-
-}
-void NavegarCursor(void) {
-
-}
-void SelecionarCarta(void) {
-
-}
-void CompararPares(void) {
-
-}
-void VerificarFimDeJogo(void) {
-
-}
-void AtualizarTentativas(void) {
-
-}
-int AtualizarRecorde(void) {
-
-}
-void ExibirFimDeJogo(void) {
-
-}
 void ReadButtons(char *out) {
 	out[0] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9);
 	out[1] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10);
 	out[2] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_11);
 	out[3] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_12);
 }
+
 void AwaitForAnyButton(void) {
 	char buttons[4];
 
 	do {
 		ReadButtons(buttons);
-	} while (!Contain(buttons, 4, 0));
+	} while (!Contains(buttons, 4, 0));
 }
+
 void DetectAnyButtonPress(char *out) {
 	char buttons[4];
-	long btnPressTime = 0;
-	int time = 0;
 
 	for (int i = 0; i < 4; ++i)
 		out[i] = 1;
 
 	do {
 		ReadButtons(buttons);
-	} while (!Contain(buttons, 4, 0));
+	} while (!Contains(buttons, 4, 0));
 
-	btnPressTime = HAL_GetTick();
+	long btnPressTime = HAL_GetTick();
 
 	do {
 		for (int i = 0; i < 4; ++i)
-			if (out[i] != 0)
+			if (out[i] == 1)
 				out[i] = buttons[i];
 
-		time = HAL_GetTick() - btnPressTime;
 		ReadButtons(buttons);
-	} while (time < 100);
+	} while (HAL_GetTick() - btnPressTime < 100);
 }
-void DetectButtonPress(const char buttons[], char *out, size_t amount) {
+void DetectButtonPress(char buttons[], char *out, size_t amount) {
 	char btnValues[4];
 	char end = 0;
 	do {
@@ -405,8 +403,9 @@ void DetectButtonPress(const char buttons[], char *out, size_t amount) {
 
 		char outIndex = 0;
 		for (int i = 0; i < 4; i++) {
-			if (Contain(buttons, amount, i + 9)) {
-				if (btnValues[i] == 0)
+			if (Contains(buttons, amount, i + 9)) {
+				char aux = NOTPRESSED;
+				if (btnValues[i] == aux)
 					end = 1;
 				out[outIndex] = btnValues[i];
 				outIndex++;
@@ -415,7 +414,7 @@ void DetectButtonPress(const char buttons[], char *out, size_t amount) {
 	} while (end == 0);
 }
 
-char Contain(char *Iterable, size_t size, char Contains) {
+char Contains(char *Iterable, size_t size, char Contains) {
 	for (int i = 0; i < size; i++) {
 		if (Iterable[i] == Contains) {
 			return 1;
