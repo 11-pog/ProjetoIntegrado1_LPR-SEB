@@ -147,6 +147,17 @@ void DetectButtonPress(char buttons[], char *out, size_t amount) {
 	} while (end == 0);
 }
 
+void TestPrint(size_t fieldSize, char field[fieldSize][fieldSize][2]) {
+	for (int i = 0; i < fieldSize; i++)
+		for (int j = 0; j < fieldSize; j++) {
+			char ToWrite[2];
+			sprintf(ToWrite, "%i", field[i][j][0]);
+
+			ST7789_WriteString(i * 36, j * 60, ToWrite, Font_11x18, WHITE,
+			BLACK);
+		};
+}
+
 char Contains(size_t size, char Iterable[size], char Contains) {
 	int recurrence = 0;
 
@@ -160,10 +171,12 @@ char Contains(size_t size, char Iterable[size], char Contains) {
 
 char ContainsVector2(size_t size, char Iterable[size][size][2], char Contains) {
 	int recurrence = 0;
+	char spy;
 
 	for (int i = 0; i < size; i++) {
 		for (int j = 0; j < size; j++) {
 			if (Iterable[i][j][0] == Contains) {
+				spy = Iterable[i][j][0];
 				recurrence++;
 			}
 		}

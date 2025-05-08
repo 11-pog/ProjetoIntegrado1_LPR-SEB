@@ -34,6 +34,9 @@ char SelectDifficulty(void);
 void PrintSelectMode(char selection);
 char SelectMode(void);
 
+// Testes
+void TestPrint(size_t fieldSize, char field[fieldSize][fieldSize][2]);
+
 // Other/Util
 char Contains(size_t size, char Iterable[size], char Contains);
 char ContainsVector2(size_t size, char Iterable[size][size][2], char Contains);

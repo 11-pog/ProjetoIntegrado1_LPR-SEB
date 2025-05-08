@@ -30,34 +30,34 @@ endif
 
 -include ../makefile.defs
 
-BUILD_ARTIFACT_NAME := Memorias_e_cartas
+BUILD_ARTIFACT_NAME := ProjetoIntegrado1_LPR-SEB
 BUILD_ARTIFACT_EXTENSION := elf
 BUILD_ARTIFACT_PREFIX := 
 BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME).$(BUILD_ARTIFACT_EXTENSION)
 
 # Add inputs and outputs from these tool invocations to the build variables 
 EXECUTABLES += \
-Memorias_e_cartas.elf \
+ProjetoIntegrado1_LPR-SEB.elf \
 
 SIZE_OUTPUT += \
 default.size.stdout \
 
 OBJDUMP_LIST += \
-Memorias_e_cartas.list \
+ProjetoIntegrado1_LPR-SEB.list \
 
 OBJCOPY_BIN += \
-Memorias_e_cartas.bin \
+ProjetoIntegrado1_LPR-SEB.bin \
 
 
 # All Target
 all: main-build
 
 # Main-build Target
-main-build: Memorias_e_cartas.elf secondary-outputs
+main-build: ProjetoIntegrado1_LPR-SEB.elf secondary-outputs
 
 # Tool invocations
-Memorias_e_cartas.elf: $(OBJS) $(USER_OBJS) C:\Users\Alunos\STM32CubeIDE_SEB2025\Memorias_e_cartas\STM32F103C8TX_FLASH.ld
-	arm-none-eabi-gcc -o "Memorias_e_cartas.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\Users\Alunos\STM32CubeIDE_SEB2025\Memorias_e_cartas\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="Memorias_e_cartas.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+ProjetoIntegrado1_LPR-SEB.elf: $(OBJS) $(USER_OBJS) D:\Stuff\Quase\ Importante\Codegos\C\STMCUBE\ProjetoIntegrado1_LPR-SEB\STM32F103C8TX_FLASH.ld
+	arm-none-eabi-gcc -o "ProjetoIntegrado1_LPR-SEB.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"D:\Stuff\Quase Importante\Codegos\C\STMCUBE\ProjetoIntegrado1_LPR-SEB\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="ProjetoIntegrado1_LPR-SEB.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
@@ -66,13 +66,13 @@ default.size.stdout: $(EXECUTABLES)
 	@echo 'Finished building: $@'
 	@echo ' '
 
-Memorias_e_cartas.list: $(EXECUTABLES)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "Memorias_e_cartas.list"
+ProjetoIntegrado1_LPR-SEB.list: $(EXECUTABLES)
+	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "ProjetoIntegrado1_LPR-SEB.list"
 	@echo 'Finished building: $@'
 	@echo ' '
 
-Memorias_e_cartas.bin: $(EXECUTABLES)
-	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "Memorias_e_cartas.bin"
+ProjetoIntegrado1_LPR-SEB.bin: $(EXECUTABLES)
+	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "ProjetoIntegrado1_LPR-SEB.bin"
 	@echo 'Finished building: $@'
 	@echo ' '
 

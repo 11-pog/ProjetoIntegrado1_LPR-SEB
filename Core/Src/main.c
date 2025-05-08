@@ -116,16 +116,7 @@ int main(void) {
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
-		for(int i = 0; i<Size;i++)
-		{
-			for(int j = 0; j < Size; j++)
-			{
-				char ToWrite[2];
-				sprintf(ToWrite, "%i", CardField[i][j][0]);
 
-				ST7789_WriteString(i*12, j*20, ToWrite, Font_11x18, WHITE, BLACK);
-			}
-		}
 
 		HAL_Delay(4000);
 		/* USER CODE END WHILE */

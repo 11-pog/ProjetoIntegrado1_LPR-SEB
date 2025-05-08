@@ -6,16 +6,23 @@ void IniciarJogo(void) {
 void GerarParesAleatorios(char fieldSize,
 		char cardField[fieldSize][fieldSize][2]) {
 
+	//char Temp[fieldSize][fieldSize];
+
+	for (int i = 0; i < fieldSize; i++)
+		for (int j = 0; j < fieldSize; j++)
+			//Temp[i][j] = 0;
+			cardField[i][j][0] = 0;
+
 	for (int i = 0; i < fieldSize; i++) {
 		for (int j = 0; j < fieldSize; j++) {
 
-			char random;
 			do {
-				random = rand() % fieldSize * fieldSize / 2;
+				cardField[i][j][0] = rand() % (fieldSize * fieldSize / 2);
+				TestPrint(fieldSize, cardField);
 				HAL_Delay(1);
-			} while (ContainsVector2(fieldSize, cardField, random) >= 2);
+			} while (ContainsVector2(fieldSize, cardField, cardField[i][j][0])
+					> 2);
 
-			cardField[i][j][0] = random;
 			cardField[i][j][1] = 0;
 		}
 	}
