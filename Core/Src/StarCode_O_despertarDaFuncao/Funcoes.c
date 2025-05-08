@@ -99,20 +99,44 @@ void PrintGameScreen(size_t size, char cardField[size][size][2]) {
 	const char cardWidth = 21;
 
 	const char cardHeightSpace = CalcCardGap(size, cardHeight);
-	const char cardWidthSpace = CalcCardGap(size, cardWidth);;
+	const char cardWidthSpace = CalcCardGap(size, cardWidth);
 
 	for (int y = 0; y < size; y++) {
 		for (int x = 0; x < size; x++) {
-			DrawCard(
-					CalcCardPos(cardWidthSpace, cardWidth, x),
-					CalcCardPos(cardHeightSpace, cardHeight, y),
-					0, 0);
+			if (cardField[y][x][1] != 2
+					|| (SelectedX == x
+					&& SelectedY == y)
+					|| (LastSelectedX == x
+					&& LastSelectedY == y)) {
+				DrawCard(CalcCardPos(cardWidthSpace, cardWidth, x),
+						CalcCardPos(cardHeightSpace, cardHeight, y), x, y, size,
+						cardField);
+			}
 		}
 	}
+
+	LastSelectedX = SelectedX;
+	LastSelectedY = SelectedY;
 }
 
-void DrawCard(char x, char y, char selection, char attr) {
-	ST7789_DrawFilledRectangle(x, y, 21, 30, WHITE);
+void DrawCard(char x, char y, int CardX, int CardY, size_t size,
+		char field[size][size][2]) {
+	if (field[CardY][CardX][1] == 0) {
+		if (CardX == SelectedX && CardY == SelectedY)
+			ST7789_DrawImage(x, y, 21, 30, (uint16_t*) SelectedCard);
+		else
+			ST7789_DrawImage(x, y, 21, 30, (uint16_t*) CardBackemon);
+	} else {
+		if (CardX == SelectedX && CardY == SelectedY)
+			ST7789_DrawFilledRectangle(x, y, 21, 30, YELLOW);
+		else
+			ST7789_DrawFilledRectangle(x, y, 21, 30, WHITE);
+
+		char NumString[2];
+		sprintf(NumString, "%i", field[CardY][CardX][0]);
+
+		ST7789_WriteString(x, y + 5, NumString, Font_11x18, BLACK, WHITE);
+	}
 }
 
 void ReadButtons(char *out) {
@@ -148,7 +172,7 @@ void DetectAnyButtonPress(char *out) {
 				out[i] = buttons[i];
 
 		ReadButtons(buttons);
-	} while (HAL_GetTick() - btnPressTime < 100);
+	} while (HAL_GetTick() - btnPressTime < 200);
 }
 
 void DetectButtonPress(char buttons[], char *out, size_t amount) {
@@ -192,14 +216,13 @@ char Contains(size_t size, char Iterable[size], char Contains) {
 	return recurrence;
 }
 
-char ContainsVector2(size_t size, char Iterable[size][size][2], char Contains) {
+char ContainsVector2(size_t size, char Iterable[size][size][2], char Contains,
+		char attr) {
 	int recurrence = 0;
-	char spy;
 
 	for (int y = 0; y < size; y++) {
 		for (int x = 0; x < size; x++) {
-			if (Iterable[y][x][0] == Contains) {
-				spy = Iterable[y][x][0];
+			if (Iterable[y][x][attr] == Contains) {
 				recurrence++;
 			}
 		}

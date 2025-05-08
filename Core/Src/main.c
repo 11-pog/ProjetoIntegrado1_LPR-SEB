@@ -25,8 +25,10 @@
 #include <stdio.h>
 
 #include "ST7789/fonts.h"
-#include "ST7789/images.h"
 #include "ST7789/st7789.h"
+
+#include "StarCode_O_despertarDaFuncao/ImagensOfTheGame.h"
+#include "StarCode_O_despertarDaFuncao/ImagensOfTheGame.h"
 
 #include "StarCode_O_despertarDaFuncao/FuncoeszinhasDoSirAndery.h"
 #include "StarCode_O_despertarDaFuncao/Funcoes.h"
@@ -112,7 +114,6 @@ int main(void) {
 		ST7789_Fill_Color(BLACK);
 
 		IniciarJogo(diff, mode);
-		AwaitForAnyButton();
 
 		/* USER CODE END WHILE */
 

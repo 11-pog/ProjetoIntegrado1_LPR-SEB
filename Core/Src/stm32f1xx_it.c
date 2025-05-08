@@ -23,6 +23,7 @@
 #include "stm32f1xx_it.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "ST7789/st7789.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -90,6 +91,7 @@ void HardFault_Handler(void)
   while (1)
   {
     /* USER CODE BEGIN W1_HardFault_IRQn 0 */
+	  ST7789_WriteString(20, 120, "DEU ERRO DEU ERRO", Font_16x26, RED, BLACK);
     /* USER CODE END W1_HardFault_IRQn 0 */
   }
 }
