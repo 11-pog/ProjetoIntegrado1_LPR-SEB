@@ -4,7 +4,7 @@
 #include "stdlib.h"
 #include "Funcoes.h"
 
-void IniciarJogo(void);
+void IniciarJogo(char diff, char mode);
 void GerarParesAleatorios(char fieldSize, char cardField[fieldSize][fieldSize][2]);
 void NavegarCursor(void);
 void SelecionarCarta(void);

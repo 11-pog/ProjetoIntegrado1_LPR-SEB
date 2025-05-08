@@ -11,6 +11,8 @@ void Menu(int record) {
 	ST7789_WriteString(36, 180, "Pressione qualquer botao", Font_7x10, WHITE,
 	BLACK);
 	ST7789_WriteString(82, 190, "Pra comecar", Font_7x10, WHITE, BLACK);
+
+	AwaitForAnyButton();
 }
 
 void PrintSelectDifficulty(char selection) {
@@ -92,6 +94,11 @@ char SelectMode(void) {
 	return selection;
 }
 
+void PrintGameScreen(char CardField)
+{
+
+}
+
 void ReadButtons(char *out) {
 	out[0] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9);
 	out[1] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10);
@@ -153,7 +160,7 @@ void TestPrint(size_t fieldSize, char field[fieldSize][fieldSize][2]) {
 			char ToWrite[2];
 			sprintf(ToWrite, "%i", field[i][j][0]);
 
-			ST7789_WriteString(i * 36, j * 60, ToWrite, Font_11x18, WHITE,
+			ST7789_WriteString(i * 36, j * 36, ToWrite, Font_11x18, WHITE,
 			BLACK);
 		};
 }

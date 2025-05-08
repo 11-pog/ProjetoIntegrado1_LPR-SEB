@@ -98,27 +98,22 @@ int main(void) {
 	/* USER CODE BEGIN 2 */
 	ST7789_Init();
 
-	Menu(record);
-	AwaitForAnyButton();
-
-	char difficulty = SelectDifficulty();
-	char playerMode = SelectMode();
-
-	ST7789_Fill_Color(BLACK);
-
-	const char Size = CalcSize(difficulty);
-
-	char CardField[Size][Size][2];
-	GerarParesAleatorios(CalcSize(difficulty), CardField);
-
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
 	while (1) {
+		ST7789_Fill_Color(BLACK);
 
+		Menu(record);
 
-		HAL_Delay(4000);
+		char diff = SelectDifficulty();
+		char mode = SelectMode();
+
+		ST7789_Fill_Color(BLACK);
+
+		IniciarJogo(diff, mode);
+		AwaitForAnyButton();
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */

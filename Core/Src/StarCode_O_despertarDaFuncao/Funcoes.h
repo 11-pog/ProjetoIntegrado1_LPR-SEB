@@ -18,9 +18,10 @@
 // Macro
 #define AlignText(x, w, len) ((ST7789_WIDTH/2) - ((len*w)/2))
 #define CalcSize(i) (4+i*2)
+#define CalcPossibilities(Size) (Size*Size/2)
 
 
-// Funções
+// Functions
 // Button Detection
 void AwaitForAnyButton(void);
 void ReadButtons(char *out);
@@ -29,10 +30,14 @@ void DetectButtonPress(char buttons[], char *out, size_t amount);
 
 // Screens
 void Menu(int record);
+
 void PrintSelectDifficulty(char selection);
 char SelectDifficulty(void);
+
 void PrintSelectMode(char selection);
 char SelectMode(void);
+
+void PrintGameScreen(char CardField);
 
 // Testes
 void TestPrint(size_t fieldSize, char field[fieldSize][fieldSize][2]);
@@ -51,7 +56,7 @@ int elion(void);
 float zel(void);
 
 // que(rosene)
-bool AAAAAAAA(void);
 int ernet(void);
+bool AAAAAAAA(void);
 
 #endif
