@@ -1,9 +1,0 @@
-FuncoeszinhasDoSirAndery.c:3:6:IniciarJogo	48	dynamic
-FuncoeszinhasDoSirAndery.c:11:6:GerarParesAleatorios	48	static
-FuncoeszinhasDoSirAndery.c:40:6:NavegarCursor	4	static
-FuncoeszinhasDoSirAndery.c:43:6:SelecionarCarta	4	static
-FuncoeszinhasDoSirAndery.c:46:6:CompararPares	4	static
-FuncoeszinhasDoSirAndery.c:49:6:VerificarFimDeJogo	4	static
-FuncoeszinhasDoSirAndery.c:52:6:AtualizarTentativas	4	static
-FuncoeszinhasDoSirAndery.c:55:5:AtualizarRecorde	4	static
-FuncoeszinhasDoSirAndery.c:58:6:ExibirFimDeJogo	4	static
