@@ -22,12 +22,11 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <string.h>
+#include <stdio.h>
+
 #include "ST7789/fonts.h"
 #include "ST7789/images.h"
 #include "ST7789/st7789.h"
-#include "stdbool.h"
-#include "stdio.h"
 
 #include "StarCode_O_despertarDaFuncao/FuncoeszinhasDoSirAndery.h"
 #include "StarCode_O_despertarDaFuncao/Funcoes.h"
@@ -51,7 +50,6 @@
 SPI_HandleTypeDef hspi1;
 
 /* USER CODE BEGIN PV */
-int record = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -97,6 +95,7 @@ int main(void) {
 	MX_SPI1_Init();
 	/* USER CODE BEGIN 2 */
 	ST7789_Init();
+	record = 0; // Init record variable
 
 	/* USER CODE END 2 */
 
@@ -114,6 +113,7 @@ int main(void) {
 
 		IniciarJogo(diff, mode);
 		AwaitForAnyButton();
+
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */

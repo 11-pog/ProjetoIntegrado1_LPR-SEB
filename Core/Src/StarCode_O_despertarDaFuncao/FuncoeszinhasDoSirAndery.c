@@ -5,9 +5,12 @@ void IniciarJogo(char diff, char mode) {
 
 	char CardField[Size][Size][2];
 	GerarParesAleatorios(Size, CardField);
-	TestPrint(Size, CardField);
 
+	//TestPrint(Size, CardField);
+
+	PrintGameScreen(Size, CardField);
 }
+
 void GerarParesAleatorios(char fieldSize,
 		char cardField[fieldSize][fieldSize][2]) {
 
@@ -28,7 +31,7 @@ void GerarParesAleatorios(char fieldSize,
 
 			do { // Enquanto tiver mais de 2 de um mesmo numero, aleatorizar denovo
 				cardField[Y][X][0] = (rand() % CalcPossibilities(fieldSize)) + 1; // aletoriza a carta em X, Y
-				HAL_Delay(.1f); // Delay pra ver
+				HAL_Delay(1); // Delay pra ver
 			} while (ContainsVector2(fieldSize, cardField, cardField[Y][X][0])
 					> 2);
 
@@ -40,21 +43,27 @@ void GerarParesAleatorios(char fieldSize,
 void NavegarCursor(void) {
 
 }
+
 void SelecionarCarta(void) {
 
 }
+
 void CompararPares(void) {
 
 }
+
 void VerificarFimDeJogo(void) {
 
 }
+
 void AtualizarTentativas(void) {
 
 }
-int AtualizarRecorde(void) {
-	return 0;
+
+void AtualizarRecorde(int amounts) {
+	if (amounts > record) record = amounts;
 }
+
 void ExibirFimDeJogo(void) {
 
 }

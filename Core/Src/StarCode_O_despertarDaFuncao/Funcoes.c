@@ -94,9 +94,25 @@ char SelectMode(void) {
 	return selection;
 }
 
-void PrintGameScreen(char CardField)
-{
+void PrintGameScreen(size_t size, char cardField[size][size][2]) {
+	const char cardHeight = 30;
+	const char cardWidth = 21;
 
+	const char cardHeightSpace = CalcCardGap(size, cardHeight);
+	const char cardWidthSpace = CalcCardGap(size, cardWidth);;
+
+	for (int y = 0; y < size; y++) {
+		for (int x = 0; x < size; x++) {
+			DrawCard(
+					CalcCardPos(cardWidthSpace, cardWidth, x),
+					CalcCardPos(cardHeightSpace, cardHeight, y),
+					0, 0);
+		}
+	}
+}
+
+void DrawCard(char x, char y, char selection, char attr) {
+	ST7789_DrawFilledRectangle(x, y, 21, 30, WHITE);
 }
 
 void ReadButtons(char *out) {
@@ -155,12 +171,12 @@ void DetectButtonPress(char buttons[], char *out, size_t amount) {
 }
 
 void TestPrint(size_t fieldSize, char field[fieldSize][fieldSize][2]) {
-	for (int i = 0; i < fieldSize; i++)
-		for (int j = 0; j < fieldSize; j++) {
+	for (int y = 0; y < fieldSize; y++)
+		for (int x = 0; x < fieldSize; x++) {
 			char ToWrite[2];
-			sprintf(ToWrite, "%i", field[i][j][0]);
+			sprintf(ToWrite, "%i", field[y][x][0]);
 
-			ST7789_WriteString(i * 36, j * 36, ToWrite, Font_11x18, WHITE,
+			ST7789_WriteString(x * 36, y * 36, ToWrite, Font_11x18, WHITE,
 			BLACK);
 		};
 }
@@ -180,10 +196,10 @@ char ContainsVector2(size_t size, char Iterable[size][size][2], char Contains) {
 	int recurrence = 0;
 	char spy;
 
-	for (int i = 0; i < size; i++) {
-		for (int j = 0; j < size; j++) {
-			if (Iterable[i][j][0] == Contains) {
-				spy = Iterable[i][j][0];
+	for (int y = 0; y < size; y++) {
+		for (int x = 0; x < size; x++) {
+			if (Iterable[y][x][0] == Contains) {
+				spy = Iterable[y][x][0];
 				recurrence++;
 			}
 		}
