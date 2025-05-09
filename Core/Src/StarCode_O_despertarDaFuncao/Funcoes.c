@@ -1,11 +1,11 @@
 #include "Funcoes.h"
 
-void Menu(int record) {
+void Menu(void) {
 	ST7789_WriteString(90, 60, "MENU", Font_16x26, WHITE, BLACK);
 	ST7789_WriteString(60, 120, "New Game", Font_11x18, WHITE, BLACK);
 
 	char result[12];
-	sprintf(result, "Record: %i", record);
+	sprintf(result, "Record: %i", GameRecord);
 	ST7789_WriteString(60, 140, result, Font_11x18, WHITE, BLACK);
 
 	ST7789_WriteString(36, 180, "Pressione qualquer botao", Font_7x10, WHITE,
@@ -95,22 +95,13 @@ char SelectMode(void) {
 }
 
 void PrintGameScreen(size_t size, char cardField[size][size][2]) {
-	const char cardHeight = 30;
-	const char cardWidth = 21;
+	const char cardGapY = CalcCardGap(size, CARD_HEIGHT);
+	const char cardGapX = CalcCardGap(size, CARD_WIDTH);
 
-	const char cardHeightSpace = CalcCardGap(size, cardHeight);
-	const char cardWidthSpace = CalcCardGap(size, cardWidth);
-
-	for (int y = 0; y < size; y++) {
+	for (int y = 0; y < size; y++) { // Literalmente Ilegível
 		for (int x = 0; x < size; x++) {
-			if (cardField[y][x][1] != 2
-					|| (SelectedX == x
-					&& SelectedY == y)
-					|| (LastSelectedX == x
-					&& LastSelectedY == y)) {
-				DrawCard(CalcCardPos(cardWidthSpace, cardWidth, x),
-						CalcCardPos(cardHeightSpace, cardHeight, y), x, y, size,
-						cardField);
+			if (UpdateCardImage(x, y, cardField[y][x]) == 1) {
+				PrintCard(x, y, cardGapX, cardGapY, size, cardField);
 			}
 		}
 	}
@@ -119,24 +110,60 @@ void PrintGameScreen(size_t size, char cardField[size][size][2]) {
 	LastSelectedY = SelectedY;
 }
 
-void DrawCard(char x, char y, int CardX, int CardY, size_t size,
-		char field[size][size][2]) {
-	if (field[CardY][CardX][1] == 0) {
-		if (CardX == SelectedX && CardY == SelectedY)
-			ST7789_DrawImage(x, y, 21, 30, (uint16_t*) SelectedCard);
-		else
-			ST7789_DrawImage(x, y, 21, 30, (uint16_t*) CardBackemon);
-	} else {
-		if (CardX == SelectedX && CardY == SelectedY)
-			ST7789_DrawFilledRectangle(x, y, 21, 30, YELLOW);
-		else
-			ST7789_DrawFilledRectangle(x, y, 21, 30, WHITE);
+char UpdateCardImage(uint8_t x, uint8_t y, char card[2])
+{
+	if ((SelectedX == x && SelectedY == y)
+			|| (LastSelectedX == x && LastSelectedY == y))
+		return 1;
 
-		char NumString[2];
-		sprintf(NumString, "%i", field[CardY][CardX][0]);
+	if (IsUnpaired(card) == 1)
+		return 1;
 
-		ST7789_WriteString(x, y + 5, NumString, Font_11x18, BLACK, WHITE);
+	return 0;
+}
+
+void PrintCard(uint8_t cardX, uint8_t cardY, uint8_t GapX, uint8_t GapY, size_t size, char field[size][size][2]) {
+	const uint8_t x = CalcCardPos(GapX, CARD_WIDTH, cardX);
+	const uint8_t y = CalcCardPos(GapY, CARD_HEIGHT, cardY);
+
+	switch (field[cardY][cardX][CARD_REVEAL_ATTR]) {
+	case UNREVEALED:
+		if (cardX == SelectedX && cardY == SelectedY)
+			ST7789_DrawImage(x, y, CARD_WIDTH, CARD_HEIGHT,
+					(uint16_t*) SelectedCard);
+		else
+			ST7789_DrawImage(x, y, CARD_WIDTH, CARD_HEIGHT,
+					(uint16_t*) CardBackemon);
+		break;
+
+	case REVEALED:
+	case PAIRED:
+		DrawRevealedCard(x, y, cardX, cardY, field[cardY][cardX][CARD_NUMBER_ATTR], WHITE);
+		break;
+
+	case RED_PAIR:
+		DrawRevealedCard(x, y, cardX, cardY, field[cardY][cardX][CARD_NUMBER_ATTR], RED);
+		break;
+
+	case BLUE_PAIR:
+		DrawRevealedCard(x, y, cardX, cardY, field[cardY][cardX][CARD_NUMBER_ATTR], BLUE);
+		break;
 	}
+}
+
+void DrawRevealedCard(uint8_t x, uint8_t y, uint8_t cardX, uint8_t cardY, char cardValue, uint16_t bgColor)
+{
+	if (cardX == SelectedX && cardY == SelectedY)
+		ST7789_DrawFilledRectangle(x, y, CARD_WIDTH - 1, CARD_HEIGHT - 1,
+		YELLOW);
+	else
+		ST7789_DrawFilledRectangle(x, y, CARD_WIDTH - 1, CARD_HEIGHT - 1,
+		bgColor);
+
+	char NumString[2];
+	sprintf(NumString, "%i", cardValue);
+
+	ST7789_WriteString(x, y + 5, NumString, Font_11x18, BLACK, WHITE);
 }
 
 void ReadButtons(char *out) {
@@ -151,28 +178,29 @@ void AwaitForAnyButton(void) {
 
 	do {
 		ReadButtons(buttons);
-	} while (!Contains(4, buttons, 0));
+	} while (!Contains(4, buttons, PRESSED));
 }
 
 void DetectAnyButtonPress(char *out) {
+	const unsigned int MultiButtonCaptureWindowMs = 200;
 	char buttons[4];
 
 	for (int i = 0; i < 4; ++i)
-		out[i] = 1;
+		out[i] = UNPRESSED;
 
 	do {
 		ReadButtons(buttons);
-	} while (!Contains(4, buttons, 0));
+	} while (!Contains(4, buttons, PRESSED));
 
 	long btnPressTime = HAL_GetTick();
 
 	do {
 		for (int i = 0; i < 4; ++i)
-			if (out[i] == 1)
+			if (out[i] == UNPRESSED)
 				out[i] = buttons[i];
 
 		ReadButtons(buttons);
-	} while (HAL_GetTick() - btnPressTime < 200);
+	} while (HAL_GetTick() - btnPressTime < MultiButtonCaptureWindowMs);
 }
 
 void DetectButtonPress(char buttons[], char *out, size_t amount) {
@@ -181,17 +209,58 @@ void DetectButtonPress(char buttons[], char *out, size_t amount) {
 	do {
 		DetectAnyButtonPress(btnValues);
 
-		char outIndex = 0;
-		for (int i = 0; i < 4; i++) {
+		uint8_t outIndex = 0;
+		for (uint8_t i = 0; i < 4; i++) {
 			if (Contains(amount, buttons, i + 9)) {
-				char aux = NOTPRESSED;
-				if (btnValues[i] == aux)
+				if (btnValues[i] == UNPRESSED)
 					end = 1;
 				out[outIndex] = btnValues[i];
 				outIndex++;
 			}
 		}
 	} while (end == 0);
+}
+
+void InitFieldMatrix(size_t size, char matrix[size][size][2]) {
+	for (int y = 0; y < size; y++) // Itera sobre toda linha na matriz
+		for (int x = 0; x < size; x++) { // Itera sobre toda coluna na matriz
+			matrix[y][x][CARD_NUMBER_ATTR] = 0; // Inicializa o numero da carta como 0 (não atribuido)
+			matrix[y][x][CARD_REVEAL_ATTR] = UNREVEALED; // Inicializa a carta como Não Revelado
+		};
+}
+
+void Pair(size_t size, char field[size][size][2], uint8_t x, uint8_t y) {
+	if (GameMode == MULTIPLAYER) {
+		if (PlayerTurn == BLUE_TURN) {
+			field[SelectedY][SelectedX][CARD_REVEAL_ATTR] = BLUE_PAIR;
+			field[y][x][CARD_REVEAL_ATTR] = BLUE_PAIR;
+			BlueScore++;
+		} else {
+			field[SelectedY][SelectedX][CARD_REVEAL_ATTR] = RED_PAIR;
+			field[y][x][CARD_REVEAL_ATTR] = RED_PAIR;
+			RedScore++;
+		}
+	} else {
+		field[SelectedY][SelectedX][CARD_REVEAL_ATTR] = PAIRED;
+		field[y][x][CARD_REVEAL_ATTR] = PAIRED;
+	}
+}
+
+void SwitchTurn(void) {
+	PlayerTurn++;
+	PlayerTurn %= 2;
+
+	ShowTurn();
+}
+
+void ShowTurn(void) {
+	if (PlayerTurn == BLUE_TURN) {
+		ST7789_DrawFilledRectangle(0, 0, 5, 240, BLUE);
+		ST7789_DrawFilledRectangle(235, 0, 5, 240, BLACK);
+	} else {
+		ST7789_DrawFilledRectangle(0, 0, 5, 240, BLACK);
+		ST7789_DrawFilledRectangle(235, 0, 5, 240, RED);
+	}
 }
 
 void TestPrint(size_t fieldSize, char field[fieldSize][fieldSize][2]) {
@@ -203,6 +272,15 @@ void TestPrint(size_t fieldSize, char field[fieldSize][fieldSize][2]) {
 			ST7789_WriteString(x * 36, y * 36, ToWrite, Font_11x18, WHITE,
 			BLACK);
 		};
+}
+
+
+char IsUnpaired(char card[2])
+{
+	if (card[CARD_REVEAL_ATTR] == UNREVEALED
+			|| card[CARD_REVEAL_ATTR] == REVEALED)
+		return 1;
+	return 0;
 }
 
 char Contains(size_t size, char Iterable[size], char Contains) {
@@ -217,11 +295,11 @@ char Contains(size_t size, char Iterable[size], char Contains) {
 }
 
 char ContainsVector2(size_t size, char Iterable[size][size][2], char Contains,
-		char attr) {
+		uint8_t attr) {
 	int recurrence = 0;
 
-	for (int y = 0; y < size; y++) {
-		for (int x = 0; x < size; x++) {
+	for (uint8_t y = 0; y < size; y++) {
+		for (uint8_t x = 0; x < size; x++) {
 			if (Iterable[y][x][attr] == Contains) {
 				recurrence++;
 			}

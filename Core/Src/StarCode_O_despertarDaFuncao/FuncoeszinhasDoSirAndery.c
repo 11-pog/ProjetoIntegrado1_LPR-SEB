@@ -7,39 +7,51 @@ void IniciarJogo(char diff, char mode) {
 	LastSelectedX = 0;
 	LastSelectedY = 0;
 
+	if (mode == MULTIPLAYER) {
+		RedScore = 0;
+		BlueScore = 0;
+
+		RedTries = 0;
+		BlueTries = 0;
+
+		PlayerTurn = rand() % 2; // Decide quem começa aleatoriamente
+		ShowTurn(); // Mostra quem começa
+	}
+
 	const char Size = CalcSize(diff);
 
 	char CardField[Size][Size][2];
 	GerarParesAleatorios(Size, CardField);
 
 	PrintGameScreen(Size, CardField);
+
 	MainGame(Size, CardField);
 }
 
 void MainGame(size_t size, char field[size][size][2]) {
 	char btns[4];
 
-
 	while (VerificarFimDeJogo(size, field) == 0) {
 		DetectAnyButtonPress(btns);
 
-		if (btns[0] == 0 && btns[2] == 0) {
+		if (btns[BTN_PIN_9] == PRESSED && btns[BTN_PIN_11] == PRESSED) {
 			SelecionarCarta(size, field);
 			continue;
 		}
 
-		if (btns[0] == 0)
+		if (btns[BTN_PIN_9] == PRESSED)
 			NavegarCursor(-1, 0, size);
-		if (btns[1] == 0)
+		if (btns[BTN_PIN_10] == PRESSED)
 			NavegarCursor(0, 1, size);
-		if (btns[2] == 0)
+		if (btns[BTN_PIN_11] == PRESSED)
 			NavegarCursor(1, 0, size);
-		if (btns[3] == 0)
+		if (btns[BTN_PIN_12] == PRESSED)
 			NavegarCursor(0, -1, size);
 
 		PrintGameScreen(size, field);
 	}
 
+	AtualizarRecorde();
 	ExibirFimDeJogo();
 }
 
@@ -54,23 +66,16 @@ void GerarParesAleatorios(char fieldSize,
 	 Attr - Os attributos de cada carta, até agora [0] é o numero/imagen da carta e [1] é se ela esta virada ou não
 	 */
 
-	for (int Y = 0; Y < fieldSize; Y++) // Itera sobre toda coluna na matriz
-		for (int X = 0; X < fieldSize; X++) // Itera sobre toda linha na matriz
-			cardField[Y][X][0] = 0; // Inicializa o array inteiro como 0
+	InitFieldMatrix(fieldSize, cardField); // Inicializa a matriz
 
-	for (int Y = 0; Y < fieldSize; Y++) { // Itera sobre toda coluna na matriz
-		for (int X = 0; X < fieldSize; X++) { // Itera sobre toda linha na matriz
-
+	for (int y = 0; y < fieldSize; y++)  // Itera sobre toda coluna na matriz
+		for (int x = 0; x < fieldSize; x++)  // Itera sobre toda linha na matriz
 			do { // Enquanto tiver mais de 2 de um mesmo numero, aleatorizar denovo
-				cardField[Y][X][0] = (rand() % CalcPossibilities(fieldSize))
-						+ 1; // aletoriza a carta em X, Y
-				HAL_Delay(1); // Delay pra ver
-			} while (ContainsVector2(fieldSize, cardField, cardField[Y][X][0],
-					0) > 2);
-
-			cardField[Y][X][1] = 0; // Atributo inicializado como 0
-		}
-	}
+				cardField[y][x][CARD_NUMBER_ATTR] = (rand()
+						% CalcPossibilities(fieldSize)) + 1; // aletoriza a carta em X, Y
+				HAL_Delay(1); // Delay por causa da pseudo-aleatoriedade
+			} while (ContainsVector2(fieldSize, cardField,
+					cardField[y][x][CARD_NUMBER_ATTR], CARD_NUMBER_ATTR) > 2);
 }
 
 void NavegarCursor(signed char directionX, signed char directionY, size_t size) {
@@ -87,32 +92,35 @@ void NavegarCursor(signed char directionX, signed char directionY, size_t size) 
 }
 
 void SelecionarCarta(size_t size, char field[size][size][2]) {
-	if (field[SelectedY][SelectedX][1] == 0)
-		field[SelectedY][SelectedX][1] = 1;
+	if (field[SelectedY][SelectedX][CARD_REVEAL_ATTR] == UNREVEALED)
+		field[SelectedY][SelectedX][CARD_REVEAL_ATTR] = REVEALED;
 
 	PrintGameScreen(size, field);
 
-	if (ContainsVector2(size, field, 1, 1) > 1) {
+	if (ContainsVector2(size, field, REVEALED, CARD_REVEAL_ATTR) > 1) {
 		CompararPares(size, field);
-
 		PrintGameScreen(size, field);
+		AtualizarTentativas();
 	}
 }
 
 void CompararPares(size_t size, char field[size][size][2]) {
-	const char selectedNumber = field[SelectedY][SelectedX][0];
+	const char selectedNumber = field[SelectedY][SelectedX][CARD_NUMBER_ATTR];
 
 	for (int y = 0; y < size; y++) {
 		for (int x = 0; x < size; x++) {
+			if (field[y][x][CARD_REVEAL_ATTR] == REVEALED) {
+				if (field[y][x][CARD_NUMBER_ATTR] == selectedNumber) {
 
-			if (field[y][x][1] == 1) {
-				if (field[y][x][0] == selectedNumber) {
-					field[SelectedY][SelectedX][1] = 2;
-					field[y][x][1] = 2;
+					Pair(size, field, x, y);
+
 				} else {
+
 					HAL_Delay(1000);
-					field[SelectedY][SelectedX][1] = 0;
-					field[y][x][1] = 0;
+					field[SelectedY][SelectedX][CARD_REVEAL_ATTR] = UNREVEALED;
+					field[y][x][CARD_REVEAL_ATTR] = UNREVEALED;
+					if (GameMode == MULTIPLAYER) SwitchTurn();
+
 				}
 			}
 
@@ -121,38 +129,83 @@ void CompararPares(size_t size, char field[size][size][2]) {
 }
 
 char VerificarFimDeJogo(char size, char cardField[size][size][2]) {
-	for (int y = 0; y < size; y++)
-		for (int x = 0; x < size; x++)
-			if (cardField[y][x][1] != 2)
-				return 0;
+	if (ContainsVector2(size, cardField, PAIRED, CARD_REVEAL_ATTR)
+			== size * size)
+		return 1;
 
-	return 1;
+	if (GameMode == MULTIPLAYER
+			&& ContainsVector2(size, cardField, RED_PAIR, CARD_REVEAL_ATTR)
+					+ ContainsVector2(size, cardField, BLUE_PAIR,
+							CARD_REVEAL_ATTR) == size * size) // Se cartas vermelhas + cartas azuis igual a quantidade de cartas maxima, termina o jogo
+		return 1;
+
+	return 0;
 }
 
-void AtualizarTentativas(char mode) {
-
+void AtualizarTentativas(void) {
+	if (GameMode == SINGLEPLAYER)
+		Tries++;
+	else if (PlayerTurn == BlueScore)
+		BlueTries++;
+	else
+		RedTries++;
 }
 
-void AtualizarRecorde(int amounts) {
-	if (amounts > record)
-		record = amounts;
+void AtualizarRecorde(void) {
+	if (Tries < GameRecord)
+		GameRecord = Tries;
 }
 
 void ExibirFimDeJogo(void) {
 	ST7789_Fill_Color(BLACK);
-	ST7789_WriteString(AlignText(16, 10), 60, "YOU GANHOU", Font_16x26, WHITE,
-			BLACK);
 
-	for (int i = 0; i < 4; i++) {
-		/*
-		ST7789_DrawImage(95, 1530, 70, 70, saber_1);
-		HAL_Delay(300);
-		ST7789_DrawImage(95, 1530, 70, 70, saber_2);
-		HAL_Delay(300);
-		ST7789_DrawImage(95, 1530, 70, 70, saber_3);
-		HAL_Delay(300);
-		ST7789_DrawImage(95, 1530, 70, 70, saber_4);
-		HAL_Delay(300);
-		*/
+	if (GameMode == SINGLEPLAYER)
+		ST7789_WriteString(AlignText(16, 10), 20, "YOU GANHOU", Font_16x26,
+		WHITE,
+		BLACK);
+	else if (BlueScore > RedScore)
+		ST7789_WriteString(AlignText(16, 11), 20, "AZUL GANHOU", Font_16x26,
+		BLUE,
+		BLACK);
+	else if (RedScore > BlueScore)
+		ST7789_WriteString(AlignText(16, 14), 20, "VERMEIO GANHOU", Font_16x26,
+		RED,
+		BLACK);
+	else
+		ST7789_WriteString(AlignText(16, 6), 20, "EMPATE", Font_16x26,
+		YELLOW,
+		BLACK);
+
+	if (GameMode == SINGLEPLAYER) {
+		char ToString[15];
+		sprintf(ToString, "Tentativas: %i", Tries);
+		ST7789_WriteString(30, 100, ToString, Font_11x18,
+		WHITE,
+		BLACK);
+	} else {
+		ST7789_WriteString(30, 70, "Tentativas: ", Font_11x18,
+				WHITE,
+				BLACK);
+		char ToString[30];
+		sprintf(ToString, "Azul = %i\nVermeio = %i", BlueTries, RedTries);
+		ST7789_WriteString(50, 90, ToString, Font_11x18,
+		WHITE,
+		BLACK);
+	}
+
+	// Saber Rodando
+	for (int i = 0; i < 6; i++) {
+		ST7789_DrawImage(95, 150, SABER_WIDTH, SABER_HEIGHT,
+				(uint16_t*) saber_1);
+		HAL_Delay(200);
+		ST7789_DrawImage(95, 150, SABER_WIDTH, SABER_HEIGHT,
+				(uint16_t*) saber_2);
+		HAL_Delay(200);
+		ST7789_DrawImage(95, 150, SABER_WIDTH, SABER_HEIGHT,
+				(uint16_t*) saber_3);
+		HAL_Delay(200);
+		ST7789_DrawImage(95, 150, SABER_WIDTH, SABER_HEIGHT,
+				(uint16_t*) saber_4);
+		HAL_Delay(200);
 	}
 }

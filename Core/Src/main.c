@@ -97,7 +97,7 @@ int main(void) {
 	MX_SPI1_Init();
 	/* USER CODE BEGIN 2 */
 	ST7789_Init();
-	record = 0; // Init record variable
+	GameRecord = 0; // Init record variable
 
 	/* USER CODE END 2 */
 
@@ -106,14 +106,14 @@ int main(void) {
 	while (1) {
 		ST7789_Fill_Color(BLACK);
 
-		Menu(record);
+		Menu();
 
 		char diff = SelectDifficulty();
-		char mode = SelectMode();
+		GameMode = SelectMode();
 
 		ST7789_Fill_Color(BLACK);
 
-		IniciarJogo(diff, mode);
+		IniciarJogo(diff, GameMode);
 
 		/* USER CODE END WHILE */
 
