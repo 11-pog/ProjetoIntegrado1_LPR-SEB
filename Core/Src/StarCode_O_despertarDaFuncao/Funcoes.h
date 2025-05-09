@@ -22,8 +22,13 @@
 #define UNPRESSED 1
 
 // Card Attributes
-#define CARD_NUMBER_ATTR 0
-#define CARD_REVEAL_ATTR 1
+#define NUMBER_ATTR 0
+#define REVEAL_ATTR 1
+#define GRAPHIC_UPDATE_STATUS 2
+
+// Graphic Update Status
+#define STANDBY 0
+#define UPDATE 1
 
 // Card Reveal Status
 #define UNREVEALED 0
@@ -35,10 +40,6 @@
 // Multiplayer Turn
 #define BLUE_TURN 0
 #define RED_TURN 1
-
-// Card Image Size
-#define CARD_HEIGHT 30
-#define CARD_WIDTH 21
 
 // Buttons
 #define BTN_PIN_9 0
@@ -91,26 +92,26 @@ char SelectDifficulty(void);
 void PrintSelectMode(char selection);
 char SelectMode(void);
 
-void PrintGameScreen(size_t size, char cardField[size][size][2]);
-char UpdateCardImage(uint8_t x, uint8_t y, char card[2]);
-void PrintCard(uint8_t cardX, uint8_t cardY, uint8_t GapX, uint8_t GapY, size_t size, char field[size][size][2]);
+void PrintGameScreen(size_t size, char cardField[size][size][3]);
+char UpdateCardImage(uint8_t x, uint8_t y, char card[3]);
+void PrintCard(uint8_t cardX, uint8_t cardY, uint8_t GapX, uint8_t GapY, size_t size, char card[3]);
 void DrawRevealedCard(uint8_t x, uint8_t y, uint8_t cardX, uint8_t cardY, char cardValue, uint16_t bgColor);
 
 // Functionality
-void InitFieldMatrix(size_t size, char matrix[size][size][2]);
-void Pair(size_t size, char field[size][size][2], uint8_t x, uint8_t y);
+void InitFieldMatrix(size_t size, char matrix[size][size][3]);
+void Pair(size_t size, char field[size][size][3], uint8_t x, uint8_t y);
 
 // Multiplayer
 void SwitchTurn(void);
 void ShowTurn(void);
 
 // Testes
-void TestPrint(size_t fieldSize, char field[fieldSize][fieldSize][2]);
+void TestPrint(size_t fieldSize, char field[fieldSize][fieldSize][3]);
 
 // Other/Util
-char IsUnpaired(char card[2]);
+char IsUnpaired(char card[3]);
 char Contains(size_t size, char Iterable[size], char Contains);
-char ContainsVector2(size_t size, char Iterable[size][size][2], char Contains, uint8_t attr);
+char ContainsVector2(size_t size, char Iterable[size][size][3], char Contains, uint8_t attr);
 
 // Pedro piadas
 typedef uint16_t ceru;

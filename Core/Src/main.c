@@ -113,7 +113,7 @@ int main(void) {
 
 		ST7789_Fill_Color(BLACK);
 
-		IniciarJogo(diff, GameMode);
+		IniciarJogo(diff);
 
 		/* USER CODE END WHILE */
 

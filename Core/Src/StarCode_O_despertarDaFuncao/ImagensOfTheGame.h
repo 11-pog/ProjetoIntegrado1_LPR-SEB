@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 #define CARD_HEIGHT 30
-#define CARD_WIDTH 21
+#define CARD_WIDTH 22
 
 extern const uint16_t CardBackemon[][CARD_WIDTH*CARD_HEIGHT/2];
 extern const uint16_t SelectedCard[][CARD_WIDTH*CARD_HEIGHT/2];

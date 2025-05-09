@@ -1,13 +1,16 @@
 #include "FuncoeszinhasDoSirAndery.h"
 
-void IniciarJogo(char diff, char mode) {
+void IniciarJogo(char diff) {
 	SelectedX = 0;
 	SelectedY = 0;
 
 	LastSelectedX = 0;
 	LastSelectedY = 0;
 
-	if (mode == MULTIPLAYER) {
+	Tries = 0;
+
+	if (GameMode == MULTIPLAYER) {
+		// Reset/Initialize Vars
 		RedScore = 0;
 		BlueScore = 0;
 
@@ -20,15 +23,30 @@ void IniciarJogo(char diff, char mode) {
 
 	const char Size = CalcSize(diff);
 
-	char CardField[Size][Size][2];
+	char CardField[Size][Size][3];
+	/*
+		 cardField[PosY][PosX][Attr]
+
+		 PosY - A coordenada Y das cartas no tabuleiro
+		 PosX - A coordenada X das cartas no tabuleiro
+		 Attr - Os attributos de cada carta.
+
+		 ATTRIBUTES:
+		 0 - NUMBER_ATTR - Representa o numero da carta
+		 1 - REVEAL_ATTR - Estado da carta (virado/desvirado/pareado)
+		 2 - GRAPHIC_UPDATE_STATUS - Força a atualização do estado da carta na tela
+
+	*/
+
+
 	GerarParesAleatorios(Size, CardField);
 
 	PrintGameScreen(Size, CardField);
 
-	MainGame(Size, CardField);
+	MainGameLoop(Size, CardField);
 }
 
-void MainGame(size_t size, char field[size][size][2]) {
+void MainGameLoop(size_t size, char field[size][size][3]) {
 	char btns[4];
 
 	while (VerificarFimDeJogo(size, field) == 0) {
@@ -56,7 +74,7 @@ void MainGame(size_t size, char field[size][size][2]) {
 }
 
 void GerarParesAleatorios(char fieldSize,
-		char cardField[fieldSize][fieldSize][2]) {
+		char cardField[fieldSize][fieldSize][3]) {
 
 	/*
 	 cardField[PosY][PosX][Attr]
@@ -68,14 +86,14 @@ void GerarParesAleatorios(char fieldSize,
 
 	InitFieldMatrix(fieldSize, cardField); // Inicializa a matriz
 
-	for (int y = 0; y < fieldSize; y++)  // Itera sobre toda coluna na matriz
-		for (int x = 0; x < fieldSize; x++)  // Itera sobre toda linha na matriz
+	for (int y = 0; y < fieldSize; y++)  // Percorre sobre toda linha na matriz
+		for (int x = 0; x < fieldSize; x++)  // Percorre sobre toda colunas na matriz
 			do { // Enquanto tiver mais de 2 de um mesmo numero, aleatorizar denovo
-				cardField[y][x][CARD_NUMBER_ATTR] = (rand()
+				cardField[y][x][NUMBER_ATTR] = (rand()
 						% CalcPossibilities(fieldSize)) + 1; // aletoriza a carta em X, Y
-				HAL_Delay(1); // Delay por causa da pseudo-aleatoriedade
+				HAL_Delay(1); // Delay por causa da pseudo-aleatoriedade0
 			} while (ContainsVector2(fieldSize, cardField,
-					cardField[y][x][CARD_NUMBER_ATTR], CARD_NUMBER_ATTR) > 2);
+					cardField[y][x][NUMBER_ATTR], NUMBER_ATTR) > 2);
 }
 
 void NavegarCursor(signed char directionX, signed char directionY, size_t size) {
@@ -91,34 +109,34 @@ void NavegarCursor(signed char directionX, signed char directionY, size_t size) 
 	SelectedY %= size;
 }
 
-void SelecionarCarta(size_t size, char field[size][size][2]) {
-	if (field[SelectedY][SelectedX][CARD_REVEAL_ATTR] == UNREVEALED)
-		field[SelectedY][SelectedX][CARD_REVEAL_ATTR] = REVEALED;
+void SelecionarCarta(size_t size, char field[size][size][3]) {
+	if (field[SelectedY][SelectedX][REVEAL_ATTR] == UNREVEALED)
+		field[SelectedY][SelectedX][REVEAL_ATTR] = REVEALED;
 
 	PrintGameScreen(size, field);
 
-	if (ContainsVector2(size, field, REVEALED, CARD_REVEAL_ATTR) > 1) {
+	if (ContainsVector2(size, field, REVEALED, REVEAL_ATTR) > 1) {
 		CompararPares(size, field);
 		PrintGameScreen(size, field);
 		AtualizarTentativas();
 	}
 }
 
-void CompararPares(size_t size, char field[size][size][2]) {
-	const char selectedNumber = field[SelectedY][SelectedX][CARD_NUMBER_ATTR];
+void CompararPares(size_t size, char field[size][size][3]) {
+	const char selectedNumber = field[SelectedY][SelectedX][NUMBER_ATTR];
 
 	for (int y = 0; y < size; y++) {
 		for (int x = 0; x < size; x++) {
-			if (field[y][x][CARD_REVEAL_ATTR] == REVEALED) {
-				if (field[y][x][CARD_NUMBER_ATTR] == selectedNumber) {
+			if (field[y][x][REVEAL_ATTR] == REVEALED) {
+				if (field[y][x][NUMBER_ATTR] == selectedNumber) {
 
 					Pair(size, field, x, y);
 
 				} else {
 
 					HAL_Delay(1000);
-					field[SelectedY][SelectedX][CARD_REVEAL_ATTR] = UNREVEALED;
-					field[y][x][CARD_REVEAL_ATTR] = UNREVEALED;
+					field[SelectedY][SelectedX][REVEAL_ATTR] = UNREVEALED;
+					field[y][x][REVEAL_ATTR] = UNREVEALED;
 					if (GameMode == MULTIPLAYER) SwitchTurn();
 
 				}
@@ -128,15 +146,15 @@ void CompararPares(size_t size, char field[size][size][2]) {
 	}
 }
 
-char VerificarFimDeJogo(char size, char cardField[size][size][2]) {
-	if (ContainsVector2(size, cardField, PAIRED, CARD_REVEAL_ATTR)
+char VerificarFimDeJogo(char size, char cardField[size][size][3]) {
+	if (ContainsVector2(size, cardField, PAIRED, REVEAL_ATTR)
 			== size * size)
 		return 1;
 
 	if (GameMode == MULTIPLAYER
-			&& ContainsVector2(size, cardField, RED_PAIR, CARD_REVEAL_ATTR)
+			&& ContainsVector2(size, cardField, RED_PAIR, REVEAL_ATTR)
 					+ ContainsVector2(size, cardField, BLUE_PAIR,
-							CARD_REVEAL_ATTR) == size * size) // Se cartas vermelhas + cartas azuis igual a quantidade de cartas maxima, termina o jogo
+							REVEAL_ATTR) == size * size) // Se cartas vermelhas + cartas azuis igual a quantidade de cartas maxima, termina o jogo
 		return 1;
 
 	return 0;
@@ -145,14 +163,14 @@ char VerificarFimDeJogo(char size, char cardField[size][size][2]) {
 void AtualizarTentativas(void) {
 	if (GameMode == SINGLEPLAYER)
 		Tries++;
-	else if (PlayerTurn == BlueScore)
+	else if (PlayerTurn == BLUE_TURN)
 		BlueTries++;
 	else
 		RedTries++;
 }
 
 void AtualizarRecorde(void) {
-	if (Tries < GameRecord)
+	if (Tries < GameRecord || GameRecord == 0)
 		GameRecord = Tries;
 }
 
