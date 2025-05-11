@@ -73,103 +73,104 @@ void PrintSelectMode(char selection) {
 }
 
 char SelectMode(void) {
-	ST7789_Fill_Color(BLACK);
-	PrintSelectMode(0);
-	char btns[3];
-	const char UsingBtns[3] = { 10, 11, 12 };
+	ST7789_Fill_Color(BLACK); //limpa a tela
+	PrintSelectMode(0); //mostra a opção inicialmente com single player selecionado
+	char btns[3]; //armazena o estado dos botões
+	const char UsingBtns[3] = { 10, 11, 12 }; //botões usados
 
-	char selection = SINGLEPLAYER;
+	char selection = SINGLEPLAYER; //Começa com single player selecionado
 
 	do {
-		DetectButtonPress((char*) UsingBtns, btns, 3);
+		DetectButtonPress((char*) UsingBtns, btns, 3); // espera a entrada de um jogador 
 
-		if (btns[0] == 0 || btns[2] == 0) {
+		if (btns[0] == 0 || btns[2] == 0) { //verifica se o botão da esquerda ou direita foi prescionado
 			selection++;
-			selection %= 2;
+			selection %= 2; //altera entre 0 e 1
 		}
 
-		PrintSelectMode(selection);
-	} while (btns[1] == UNPRESSED);
+		PrintSelectMode(selection); //atualiza a tela 
+	} while (btns[1] == UNPRESSED); //sai do loop quando o botão for prescionado
 
 	return selection;
 }
 
-void PrintGameScreen(size_t size, char cardField[size][size][3]) {
-	const char cardGapY = CalcCardGap(size, CARD_HEIGHT);
-	const char cardGapX = CalcCardGap(size, CARD_WIDTH);
+void PrintGameScreen(size_t size, char cardField[size][size][3]) { //desenha todas as cartas na tela 
+	const char cardGapY = CalcCardGap(size, CARD_HEIGHT); //calcula espaço na vertical entre as cartas
+	const char cardGapX = CalcCardGap(size, CARD_WIDTH); //calcula espaço na horizontal entre as cartas
 
 	for (int y = 0; y < size; y++) {
 		for (int x = 0; x < size; x++) {
-			if (UpdateCardImage(x, y, cardField[y][x]) == 1) {
-				PrintCard(x, y, cardGapX, cardGapY, size, cardField[y][x]);
-				cardField[y][x][GRAPHIC_UPDATE_STATUS] = STANDBY;
+			if (UpdateCardImage(x, y, cardField[y][x]) == 1) { // verifica se a carta precisa ser redesehada
+				PrintCard(x, y, cardGapX, cardGapY, size, cardField[y][x]); //desenha a carta
+				cardField[y][x][GRAPHIC_UPDATE_STATUS] = STANDBY; //não precisa atualizar
 			}
 		}
 	}
 
-	LastSelectedX = SelectedX;
+	LastSelectedX = SelectedX; //atualiza a seleção de carta selecionada anteriormente
 	LastSelectedY = SelectedY;
 }
 
-char UpdateCardImage(uint8_t x, uint8_t y, char card[3]) {
+char UpdateCardImage(uint8_t x, uint8_t y, char card[3]) { //verifica se a imagem da carta precisa ser atualizada
 	if ((SelectedX == x && SelectedY == y)
 			|| (LastSelectedX == x && LastSelectedY == y))
-		return 1;
+		return 1; //atualiza se for a carta atual ou anterior
 
 	if (IsUnpaired(card) == 1)
-		return 1;
+		return 1; //atualiza se a carta não foi pareda
 
 	if (card[GRAPHIC_UPDATE_STATUS] == UPDATE)
-		return 1;
+		return 1; //atualiza status grafico 
 
-	return 0;
+	return 0; //não atualiza status grafico
 }
 
 void PrintCard(uint8_t cardX, uint8_t cardY, uint8_t GapX, uint8_t GapY, size_t size, char card[3]) {
-	const uint8_t x = CalcCardPos(GapX, CARD_WIDTH, cardX);
-	const uint8_t y = CalcCardPos(GapY, CARD_HEIGHT, cardY);
+	const uint8_t x = CalcCardPos(GapX, CARD_WIDTH, cardX); //calcula a posição x da carta
+	const uint8_t y = CalcCardPos(GapY, CARD_HEIGHT, cardY); //calcula a posição y da carta
 
 	switch (card[REVEAL_ATTR]) {
-	case UNREVEALED:
+	case UNREVEALED: //carta virada
 		if (cardX == SelectedX && cardY == SelectedY)
-			ST7789_DrawImage(x, y, CARD_WIDTH, CARD_HEIGHT,
+			ST7789_DrawImage(x, y, CARD_WIDTH, CARD_HEIGHT, //imagem de seleção
 					(uint16_t*) SelectedCard);
 		else
-			ST7789_DrawImage(x, y, CARD_WIDTH, CARD_HEIGHT,
+			ST7789_DrawImage(x, y, CARD_WIDTH, CARD_HEIGHT, //imagem do verso
 					(uint16_t*) CardBackemon);
 		break;
 
-	case REVEALED:
-	case PAIRED:
-		DrawRevealedCard(x, y, cardX, cardY, card[NUMBER_ATTR], WHITE);
+	case REVEALED: //carta revelada temporariamnete
+	case PAIRED: //carta revelada permantente
+		DrawRevealedCard(x, y, cardX, cardY, card[NUMBER_ATTR], WHITE); //fundo branco
 		break;
 
 	case RED_PAIR:
-		DrawRevealedCard(x, y, cardX, cardY, card[NUMBER_ATTR], RED);
+		DrawRevealedCard(x, y, cardX, cardY, card[NUMBER_ATTR], RED); //fundo vermelho
 		break;
 
 	case BLUE_PAIR:
-		DrawRevealedCard(x, y, cardX, cardY, card[NUMBER_ATTR], BLUE);
+		DrawRevealedCard(x, y, cardX, cardY, card[NUMBER_ATTR], BLUE); //fundo azul
 		break;
 	}
 }
 
+//desenha uma carta revelada com seu numero 
 void DrawRevealedCard(uint8_t x, uint8_t y, uint8_t cardX, uint8_t cardY, char cardValue, uint16_t bgColor)
 {
-	if (cardX == SelectedX && cardY == SelectedY)
-		ST7789_DrawFilledRectangle(x, y, CARD_WIDTH - 1, CARD_HEIGHT - 1,
+	if (cardX == SelectedX && cardY == SelectedY) 
+		ST7789_DrawFilledRectangle(x, y, CARD_WIDTH - 1, CARD_HEIGHT - 1, //destaque para carta selecionada
 		YELLOW);
 	else
-		ST7789_DrawFilledRectangle(x, y, CARD_WIDTH - 1, CARD_HEIGHT - 1,
+		ST7789_DrawFilledRectangle(x, y, CARD_WIDTH - 1, CARD_HEIGHT - 1, // fundo com a cor atual
 		bgColor);
 
-	char NumString[2];
-	sprintf(NumString, "%i", cardValue);
+	char NumString[2]; //string para exibir o numero da carta
+	sprintf(NumString, "%i", cardValue); //converte o valor para string
 
-	ST7789_WriteString(x, y + 5, NumString, Font_11x18, BLACK, WHITE);
+	ST7789_WriteString(x, y + 5, NumString, Font_11x18, BLACK, WHITE); //escreve o numero na tela
 }
 
-void ReadButtons(char *out) {
+void ReadButtons(char *out) { // le os estados do pino e armazena num array
 	out[0] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_9);
 	out[1] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_10);
 	out[2] = HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_11);
@@ -177,106 +178,107 @@ void ReadButtons(char *out) {
 }
 
 void AwaitForAnyButton(void) {
-	char buttons[4];
+	char buttons[4]; //armazena os estados do botão
 
 	do {
-		ReadButtons(buttons);
-	} while (!Contains(4, buttons, PRESSED));
+		ReadButtons(buttons); //lê os estados do botão
+	} while (!Contains(4, buttons, PRESSED)); //continua lenda até que um botão seja prescionado
 }
 
 void DetectAnyButtonPress(char *out) {
-	const unsigned int MultiButtonCaptureWindowMs = 200;
-	char buttons[4];
+	const unsigned int MultiButtonCaptureWindowMs = 200; // detecta multiplos botões prescionados
+	char buttons[4]; //armazena estado atual dos botões
 
-	for (int i = 0; i < 4; ++i)
+	for (int i = 0; i < 4; ++i) //inicializa todos os botões como não prescionados
 		out[i] = UNPRESSED;
 
-	do {
+	do { //aguarda até que um botão seja prescionado
 		ReadButtons(buttons);
 	} while (!Contains(4, buttons, PRESSED));
 
-	long btnPressTime = HAL_GetTick();
-
+	long btnPressTime = HAL_GetTick();  //armazena o tempo de inicip da detecção
+	//registra os botões prescionados
 	do {
 		for (int i = 0; i < 4; ++i)
 			if (out[i] == UNPRESSED)
 				out[i] = buttons[i];
 
 		ReadButtons(buttons);
-	} while (HAL_GetTick() - btnPressTime < MultiButtonCaptureWindowMs);
+	} while (HAL_GetTick() - btnPressTime < MultiButtonCaptureWindowMs); //atualiza a leitura dos botão
 }
 
 void DetectButtonPress(char buttons[], char *out, size_t amount) {
-	char btnValues[4];
-	char end = 0;
+	char btnValues[4]; //arnazena os valores de 4 botão
+	char end = 0; //termina a detecção
 	do {
-		DetectAnyButtonPress(btnValues);
+		DetectAnyButtonPress(btnValues); // detecta qualquer botão prescionado
 
-		uint8_t outIndex = 0;
+		uint8_t outIndex = 0; //escrita no vetor de saida
 		for (uint8_t i = 0; i < 4; i++) {
-			if (Contains(amount, buttons, i + 9)) {
+			if (Contains(amount, buttons, i + 9)) { //
 				if (btnValues[i] == UNPRESSED)
-					end = 1;
-				out[outIndex] = btnValues[i];
+					end = 1; //se o botão for solto, termina
+				out[outIndex] = btnValues[i]; //salva o valor do botão num vetor de saida
 				outIndex++;
 			}
 		}
-	} while (end == 0);
+	} while (end == 0); //repete até que um botão seja prescionado
 }
 
 void InitFieldMatrix(size_t size, char matrix[size][size][3]) {
+	//inicializa cada carta na matriz
 	for (int y = 0; y < size; y++) // Percorre sobre toda linha na matriz
 		for (int x = 0; x < size; x++) { // Percorre sobre toda coluna na matriz
 			matrix[y][x][NUMBER_ATTR] = 0; // Inicializa o numero da carta como 0 (não atribuido)
 			matrix[y][x][REVEAL_ATTR] = UNREVEALED; // Inicializa a carta como Não Revelado
-			matrix[y][x][GRAPHIC_UPDATE_STATUS] = UPDATE;
+			matrix[y][x][GRAPHIC_UPDATE_STATUS] = UPDATE; //marca para atualizar o grafico da carta
 		};
 }
 
 void Pair(size_t size, char field[size][size][3], uint8_t x, uint8_t y) {
-	if (GameMode == MULTIPLAYER) {
-		if (PlayerTurn == BLUE_TURN) {
-			field[SelectedY][SelectedX][REVEAL_ATTR] = BLUE_PAIR;
-			field[y][x][REVEAL_ATTR] = BLUE_PAIR;
-			BlueScore++;
+	if (GameMode == MULTIPLAYER) { //se o modo de jogo for multiplayer
+		if (PlayerTurn == BLUE_TURN) { //vez do jogador azul
+			field[SelectedY][SelectedX][REVEAL_ATTR] = BLUE_PAIR; //marca a carta selecionada como par azul
+			field[y][x][REVEAL_ATTR] = BLUE_PAIR; //marca a outra carta como azul
+			BlueScore++; //incrementa pontuação no jogador azul
 		} else {
-			field[SelectedY][SelectedX][REVEAL_ATTR] = RED_PAIR;
-			field[y][x][REVEAL_ATTR] = RED_PAIR;
-			RedScore++;
+			field[SelectedY][SelectedX][REVEAL_ATTR] = RED_PAIR; //marca como carta selecionada como paz vermelho
+			field[y][x][REVEAL_ATTR] = RED_PAIR; //merca outra carta como vermelho
+			RedScore++; //incrementa pontuação para o jogador vermelho
 		}
-	} else {
-		field[SelectedY][SelectedX][REVEAL_ATTR] = PAIRED;
+	} else { // se for singleplayer
+		field[SelectedY][SelectedX][REVEAL_ATTR] = PAIRED; //ambas as cartas como par encontrado
 		field[y][x][REVEAL_ATTR] = PAIRED;
 	}
 
-	field[SelectedY][SelectedX][GRAPHIC_UPDATE_STATUS] = UPDATE;
+	field[SelectedY][SelectedX][GRAPHIC_UPDATE_STATUS] = UPDATE; // marca as duas cartas para atualização grafica
 	field[y][x][GRAPHIC_UPDATE_STATUS] = UPDATE;
 }
 
 void SwitchTurn(void) {
-	PlayerTurn++;
-	PlayerTurn %= 2;
+	PlayerTurn++; //avança para o proximo jogador
+	PlayerTurn %= 2; //altera entre os 2 jogadores
 
-	ShowTurn();
+	ShowTurn(); 
 }
 
 void ShowTurn(void) {
 	if (PlayerTurn == BLUE_TURN) {
-		ST7789_DrawFilledRectangle(0, 0, 5, 240, BLUE);
-		ST7789_DrawFilledRectangle(235, 0, 5, 240, BLACK);
+		ST7789_DrawFilledRectangle(0, 0, 5, 240, BLUE); //mostra faixa azul na esquerda
+		ST7789_DrawFilledRectangle(235, 0, 5, 240, BLACK); //apaga a faixa da direita
 	} else {
-		ST7789_DrawFilledRectangle(0, 0, 5, 240, BLACK);
-		ST7789_DrawFilledRectangle(235, 0, 5, 240, RED);
+		ST7789_DrawFilledRectangle(0, 0, 5, 240, BLACK); //apaga a faixa da esquerda
+		ST7789_DrawFilledRectangle(235, 0, 5, 240, RED); //mostra faixa vermelha na direita
 	}
 }
 
 void TestPrint(size_t fieldSize, char field[fieldSize][fieldSize][3]) {
-	for (int y = 0; y < fieldSize; y++)
-		for (int x = 0; x < fieldSize; x++) {
-			char ToWrite[2];
-			sprintf(ToWrite, "%i", field[y][x][NUMBER_ATTR]);
+	for (int y = 0; y < fieldSize; y++) //percorre linhas 
+		for (int x = 0; x < fieldSize; x++) { //percorre colunas
+			char ToWrite[2]; //string do numero da carta
+			sprintf(ToWrite, "%i", field[y][x][NUMBER_ATTR]); //converte o numero da carta para string
 
-			ST7789_WriteString(x * 36, y * 36, ToWrite, Font_11x18, WHITE,
+			ST7789_WriteString(x * 36, y * 36, ToWrite, Font_11x18, WHITE, //escreve numero na tela
 			BLACK);
 		};
 }
@@ -284,33 +286,33 @@ void TestPrint(size_t fieldSize, char field[fieldSize][fieldSize][3]) {
 
 char IsUnpaired(char card[3])
 {
-	if (card[REVEAL_ATTR] == UNREVEALED
+	if (card[REVEAL_ATTR] == UNREVEALED // verifica se a carta esta revalada ou virada mas sem par
 			|| card[REVEAL_ATTR] == REVEALED)
-		return 1;
-	return 0;
+		return 1; //sem par
+	return 0; // tem par
 }
 
 char Contains(size_t size, char Iterable[size], char Contains) {
-	int recurrence = 0;
+	int recurrence = 0; // contador de ocorrencias
 
 	for (int i = 0; i < size; i++) {
-		if (Iterable[i] == Contains) {
-			recurrence++;
+		if (Iterable[i] == Contains) { //valor atual é igual ao valor procurado
+			recurrence++; //incrementa ao contador
 		}
 	}
-	return recurrence;
+	return recurrence; // retorna a quantidade de vezes que foi encontrada
 }
 
 char ContainsVector2(size_t size, char Iterable[size][size][3], char Contains,
 		uint8_t attr) {
-	int recurrence = 0;
+	int recurrence = 0; // contador de ocorencias
 
-	for (uint8_t y = 0; y < size; y++) {
-		for (uint8_t x = 0; x < size; x++) {
-			if (Iterable[y][x][attr] == Contains) {
-				recurrence++;
+	for (uint8_t y = 0; y < size; y++) { // itera pelas linhas
+		for (uint8_t x = 0; x < size; x++) { // itera pelas colunas
+			if (Iterable[y][x][attr] == Contains) { // verifica o atributo da carta
+				recurrence++; // incrementa se for igual ao valor procurado
 			}
 		}
 	}
-	return recurrence;
+	return recurrence; //retorna ao total de incremencias
 }
