@@ -60,12 +60,12 @@ void PrintSelectMode(char selection) {
 	ST7789_WriteString(20, 30, "Modo de Jogo: ", Font_11x18, WHITE, BLACK);
 	switch (selection) {
 	case 0:
-		ST7789_WriteString(10, 120, "Singleplayer", Font_11x18, YELLOW, BLACK);
-		ST7789_WriteString(10, 140, "Multiplayer", Font_11x18, WHITE, BLACK);
+		ST7789_WriteString(10, 120, "SINGLEPLAYER", Font_11x18, YELLOW, BLACK);
+		ST7789_WriteString(10, 140, "MULTIPLAYER", Font_11x18, WHITE, BLACK);
 		break;
 	case 1:
-		ST7789_WriteString(10, 120, "Singleplayer", Font_11x18, WHITE, BLACK);
-		ST7789_WriteString(10, 140, "Multiplayer", Font_11x18, YELLOW, BLACK);
+		ST7789_WriteString(10, 120, "SINGLEPLAYER", Font_11x18, WHITE, BLACK);
+		ST7789_WriteString(10, 140, "MULTIPLAYER", Font_11x18, YELLOW, BLACK);
 		break;
 	default:
 		break;
