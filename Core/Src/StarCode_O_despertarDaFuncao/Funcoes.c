@@ -51,7 +51,7 @@ char SelectDifficulty(void) {
 		}
 
 		PrintSelectDifficulty(selection);
-	} while (btns[1] == UNPRESSED);
+	} while (btns[1] != PRESSED);
 
 	return selection;
 }
@@ -89,7 +89,7 @@ char SelectMode(void) {
 		}
 
 		PrintSelectMode(selection);
-	} while (btns[1] == UNPRESSED);
+	} while (btns[1] != PRESSED);
 
 	return selection;
 }
@@ -215,7 +215,7 @@ void DetectButtonPress(char buttons[], char *out, size_t amount) {
 		uint8_t outIndex = 0;
 		for (uint8_t i = 0; i < 4; i++) {
 			if (Contains(amount, buttons, i + 9)) {
-				if (btnValues[i] == UNPRESSED)
+				if (btnValues[i] == PRESSED)
 					end = 1;
 				out[outIndex] = btnValues[i];
 				outIndex++;
