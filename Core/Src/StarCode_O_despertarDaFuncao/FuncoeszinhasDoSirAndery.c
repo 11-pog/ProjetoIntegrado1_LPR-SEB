@@ -109,9 +109,10 @@ void NavegarCursor(signed char directionX, signed char directionY, size_t size) 
 }
 
 void SelecionarCarta(size_t size, char field[size][size][3]) {
-	if (field[SelectedY][SelectedX][REVEAL_ATTR] == UNREVEALED)
+	if (field[SelectedY][SelectedX][REVEAL_ATTR] == UNREVEALED) {
 		field[SelectedY][SelectedX][REVEAL_ATTR] = REVEALED;
-	else
+		field[SelectedY][SelectedX][GRAPHIC_UPDATE_ATTR] = UPDATE;
+	} else
 		return;
 
 	PrintGameScreen(size, field);
@@ -142,8 +143,10 @@ void CompararPares(size_t size, char field[size][size][3]) {
 						SwitchTurn();
 
 				}
-			}
 
+				field[SelectedY][SelectedX][GRAPHIC_UPDATE_ATTR] = UPDATE;
+				field[y][x][GRAPHIC_UPDATE_ATTR] = UPDATE;
+			}
 		}
 	}
 }

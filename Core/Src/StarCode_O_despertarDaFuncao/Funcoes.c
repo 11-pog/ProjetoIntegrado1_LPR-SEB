@@ -116,9 +116,6 @@ char UpdateCardImage(uint8_t x, uint8_t y, char card[3]) { //verifica se a image
 			|| (LastSelectedX == x && LastSelectedY == y))
 		return 1; //atualiza se for a carta atual ou anterior
 
-	if (IsUnpaired(card) == 1)
-		return 1; //atualiza se a carta não foi pareda
-
 	if (card[GRAPHIC_UPDATE_STATUS] == UPDATE)
 		return 1; //atualiza status grafico 
 
@@ -250,9 +247,6 @@ void Pair(size_t size, char field[size][size][3], uint8_t x, uint8_t y) {
 		field[SelectedY][SelectedX][REVEAL_ATTR] = PAIRED; //ambas as cartas como par encontrado
 		field[y][x][REVEAL_ATTR] = PAIRED;
 	}
-
-	field[SelectedY][SelectedX][GRAPHIC_UPDATE_STATUS] = UPDATE; // marca as duas cartas para atualização grafica
-	field[y][x][GRAPHIC_UPDATE_STATUS] = UPDATE;
 }
 
 void SwitchTurn(void) {
@@ -282,7 +276,6 @@ void TestPrint(size_t fieldSize, char field[fieldSize][fieldSize][3]) {
 			BLACK);
 		};
 }
-
 
 char IsUnpaired(char card[3])
 {
