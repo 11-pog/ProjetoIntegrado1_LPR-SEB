@@ -232,7 +232,7 @@ void InitFieldMatrix(size_t size, char matrix[size][size][3]) {
 			matrix[y][x][GRAPHIC_UPDATE_STATUS] = UPDATE;
 		};
 }
-// Teste
+
 void Pair(size_t size, char field[size][size][3], uint8_t x, uint8_t y) {
 	if (GameMode == MULTIPLAYER) {
 		if (PlayerTurn == BLUE_TURN) {
