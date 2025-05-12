@@ -25,19 +25,18 @@ void IniciarJogo(char diff) {
 
 	char CardField[Size][Size][3];
 	/*
-		 cardField[PosY][PosX][Attr]
+	 cardField[PosY][PosX][Attr]
 
-		 PosY - A coordenada Y das cartas no tabuleiro
-		 PosX - A coordenada X das cartas no tabuleiro
-		 Attr - Os attributos de cada carta.
+	 PosY - A coordenada Y das cartas no tabuleiro
+	 PosX - A coordenada X das cartas no tabuleiro
+	 Attr - Os attributos de cada carta.
 
-		 ATTRIBUTES:
-		 0 - NUMBER_ATTR - Representa o numero da carta
-		 1 - REVEAL_ATTR - Estado da carta (virado/desvirado/pareado)
-		 2 - GRAPHIC_UPDATE_STATUS - Força a atualização do estado da carta na tela
+	 ATTRIBUTES:
+	 0 - NUMBER_ATTR - Representa o numero da carta
+	 1 - REVEAL_ATTR - Estado da carta (virado/desvirado/pareado)
+	 2 - GRAPHIC_UPDATE_STATUS - Força a atualização do estado da carta na tela
 
-	*/
-
+	 */
 
 	GerarParesAleatorios(Size, CardField);
 
@@ -87,7 +86,7 @@ void GerarParesAleatorios(char fieldSize,
 	InitFieldMatrix(fieldSize, cardField); // Inicializa a matriz
 
 	for (int y = 0; y < fieldSize; y++)  // Percorre sobre toda linha na matriz
-		for (int x = 0; x < fieldSize; x++)  // Percorre sobre toda colunas na matriz
+		for (int x = 0; x < fieldSize; x++) // Percorre sobre toda colunas na matriz
 			do { // Enquanto tiver mais de 2 de um mesmo numero, aleatorizar denovo
 				cardField[y][x][NUMBER_ATTR] = (rand()
 						% CalcPossibilities(fieldSize)) + 1; // aletoriza a carta em X, Y
@@ -112,6 +111,8 @@ void NavegarCursor(signed char directionX, signed char directionY, size_t size) 
 void SelecionarCarta(size_t size, char field[size][size][3]) {
 	if (field[SelectedY][SelectedX][REVEAL_ATTR] == UNREVEALED)
 		field[SelectedY][SelectedX][REVEAL_ATTR] = REVEALED;
+	else
+		return;
 
 	PrintGameScreen(size, field);
 
@@ -137,7 +138,8 @@ void CompararPares(size_t size, char field[size][size][3]) {
 					HAL_Delay(1000);
 					field[SelectedY][SelectedX][REVEAL_ATTR] = UNREVEALED;
 					field[y][x][REVEAL_ATTR] = UNREVEALED;
-					if (GameMode == MULTIPLAYER) SwitchTurn();
+					if (GameMode == MULTIPLAYER)
+						SwitchTurn();
 
 				}
 			}
@@ -147,14 +149,13 @@ void CompararPares(size_t size, char field[size][size][3]) {
 }
 
 char VerificarFimDeJogo(char size, char cardField[size][size][3]) {
-	if (ContainsVector2(size, cardField, PAIRED, REVEAL_ATTR)
-			== size * size)
+	if (ContainsVector2(size, cardField, PAIRED, REVEAL_ATTR) == size * size)
 		return 1;
 
 	if (GameMode == MULTIPLAYER
 			&& ContainsVector2(size, cardField, RED_PAIR, REVEAL_ATTR)
 					+ ContainsVector2(size, cardField, BLUE_PAIR,
-							REVEAL_ATTR) == size * size) // Se cartas vermelhas + cartas azuis igual a quantidade de cartas maxima, termina o jogo
+					REVEAL_ATTR) == size * size) // Se cartas vermelhas + cartas azuis igual a quantidade de cartas maxima, termina o jogo
 		return 1;
 
 	return 0;
@@ -202,8 +203,8 @@ void ExibirFimDeJogo(void) {
 		BLACK);
 	} else {
 		ST7789_WriteString(30, 70, "Tentativas: ", Font_11x18,
-				WHITE,
-				BLACK);
+		WHITE,
+		BLACK);
 		char ToString[30];
 		sprintf(ToString, "Azul = %i\nVermeio = %i", BlueTries, RedTries);
 		ST7789_WriteString(50, 90, ToString, Font_11x18,

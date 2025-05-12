@@ -51,7 +51,7 @@ char SelectDifficulty(void) {
 		}
 
 		PrintSelectDifficulty(selection);
-	} while (btns[1] == UNPRESSED);
+	} while (btns[1] != PRESSED);
 
 	return selection;
 }
@@ -83,13 +83,13 @@ char SelectMode(void) {
 	do {
 		DetectButtonPress((char*) UsingBtns, btns, 3); // espera a entrada de um jogador 
 
-		if (btns[0] == 0 || btns[2] == 0) { //verifica se o botão da esquerda ou direita foi prescionado
+		if (btns[0] == 0 || btns[2] == 0) { //verifica se o botão da esquerda ou direita foi pressionado
 			selection++;
 			selection %= 2; //altera entre 0 e 1
 		}
 
 		PrintSelectMode(selection); //atualiza a tela 
-	} while (btns[1] == UNPRESSED); //sai do loop quando o botão for prescionado
+	} while (btns[1] != PRESSED); //sai do loop quando o botão for pressionado
 
 	return selection;
 }
@@ -182,22 +182,22 @@ void AwaitForAnyButton(void) {
 
 	do {
 		ReadButtons(buttons); //lê os estados do botão
-	} while (!Contains(4, buttons, PRESSED)); //continua lenda até que um botão seja prescionado
+	} while (!Contains(4, buttons, PRESSED)); //continua lenda até que um botão seja pressionado
 }
 
 void DetectAnyButtonPress(char *out) {
-	const unsigned int MultiButtonCaptureWindowMs = 200; // detecta multiplos botões prescionados
+	const unsigned int MultiButtonCaptureWindowMs = 200; // detecta multiplos botões pressionados
 	char buttons[4]; //armazena estado atual dos botões
 
-	for (int i = 0; i < 4; ++i) //inicializa todos os botões como não prescionados
+	for (int i = 0; i < 4; ++i) //inicializa todos os botões como não pressionados
 		out[i] = UNPRESSED;
 
-	do { //aguarda até que um botão seja prescionado
+	do { //aguarda até que um botão seja pressionado
 		ReadButtons(buttons);
 	} while (!Contains(4, buttons, PRESSED));
 
-	long btnPressTime = HAL_GetTick();  //armazena o tempo de inicip da detecção
-	//registra os botões prescionados
+	long btnPressTime = HAL_GetTick();  //armazena o tempo de inicio da detecção
+	//registra os botões pressionados
 	do {
 		for (int i = 0; i < 4; ++i)
 			if (out[i] == UNPRESSED)
@@ -208,21 +208,21 @@ void DetectAnyButtonPress(char *out) {
 }
 
 void DetectButtonPress(char buttons[], char *out, size_t amount) {
-	char btnValues[4]; //arnazena os valores de 4 botão
+	char btnValues[4]; //armazena os valores de 4 botão
 	char end = 0; //termina a detecção
 	do {
-		DetectAnyButtonPress(btnValues); // detecta qualquer botão prescionado
+		DetectAnyButtonPress(btnValues); // detecta qualquer botão pressionado
 
 		uint8_t outIndex = 0; //escrita no vetor de saida
 		for (uint8_t i = 0; i < 4; i++) {
-			if (Contains(amount, buttons, i + 9)) { //
-				if (btnValues[i] == UNPRESSED)
-					end = 1; //se o botão for solto, termina
+			if (Contains(amount, buttons, i + 9)) { //verifica se um botão foi pressionado
+				if (btnValues[i] == PRESSED)
+					end = 1; //se o botão for pressionado, termina
 				out[outIndex] = btnValues[i]; //salva o valor do botão num vetor de saida
 				outIndex++;
 			}
 		}
-	} while (end == 0); //repete até que um botão seja prescionado
+	} while (end == 0); //repete até que um botão seja pressionado
 }
 
 void InitFieldMatrix(size_t size, char matrix[size][size][3]) {
