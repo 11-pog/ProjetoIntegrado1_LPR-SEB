@@ -24,7 +24,7 @@
 // Card Attributes
 #define NUMBER_ATTR 0
 #define REVEAL_ATTR 1
-#define GRAPHIC_UPDATE_STATUS 2
+#define GRAPHIC_UPDATE_ATTR 2
 
 // Graphic Update Status
 #define STANDBY 0

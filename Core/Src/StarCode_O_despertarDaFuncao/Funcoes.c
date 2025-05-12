@@ -102,7 +102,7 @@ void PrintGameScreen(size_t size, char cardField[size][size][3]) {
 		for (int x = 0; x < size; x++) {
 			if (UpdateCardImage(x, y, cardField[y][x]) == 1) {
 				PrintCard(x, y, cardGapX, cardGapY, size, cardField[y][x]);
-				cardField[y][x][GRAPHIC_UPDATE_STATUS] = STANDBY;
+				cardField[y][x][GRAPHIC_UPDATE_ATTR] = STANDBY;
 			}
 		}
 	}
@@ -116,10 +116,7 @@ char UpdateCardImage(uint8_t x, uint8_t y, char card[3]) {
 			|| (LastSelectedX == x && LastSelectedY == y))
 		return 1;
 
-	if (IsUnpaired(card) == 1)
-		return 1;
-
-	if (card[GRAPHIC_UPDATE_STATUS] == UPDATE)
+	if (card[GRAPHIC_UPDATE_ATTR] == UPDATE)
 		return 1;
 
 	return 0;
@@ -225,11 +222,11 @@ void DetectButtonPress(char buttons[], char *out, size_t amount) {
 }
 
 void InitFieldMatrix(size_t size, char matrix[size][size][3]) {
-	for (int y = 0; y < size; y++) // Percorre sobre toda linha na matriz
-		for (int x = 0; x < size; x++) { // Percorre sobre toda coluna na matriz
-			matrix[y][x][NUMBER_ATTR] = 0; // Inicializa o numero da carta como 0 (não atribuido)
-			matrix[y][x][REVEAL_ATTR] = UNREVEALED; // Inicializa a carta como Não Revelado
-			matrix[y][x][GRAPHIC_UPDATE_STATUS] = UPDATE;
+	for (int y = 0; y < size; y++)
+		for (int x = 0; x < size; x++) {
+			matrix[y][x][NUMBER_ATTR] = 0;
+			matrix[y][x][REVEAL_ATTR] = UNREVEALED;
+			matrix[y][x][GRAPHIC_UPDATE_ATTR] = UPDATE;
 		};
 }
 
@@ -248,9 +245,6 @@ void Pair(size_t size, char field[size][size][3], uint8_t x, uint8_t y) {
 		field[SelectedY][SelectedX][REVEAL_ATTR] = PAIRED;
 		field[y][x][REVEAL_ATTR] = PAIRED;
 	}
-
-	field[SelectedY][SelectedX][GRAPHIC_UPDATE_STATUS] = UPDATE;
-	field[y][x][GRAPHIC_UPDATE_STATUS] = UPDATE;
 }
 
 void SwitchTurn(void) {
@@ -280,7 +274,6 @@ void TestPrint(size_t fieldSize, char field[fieldSize][fieldSize][3]) {
 			BLACK);
 		};
 }
-
 
 char IsUnpaired(char card[3])
 {
