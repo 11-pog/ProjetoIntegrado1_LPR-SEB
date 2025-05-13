@@ -34,8 +34,7 @@ void IniciarJogo(char diff) {
 		 ATTRIBUTES:
 		 0 - NUMBER_ATTR - Representa o numero da carta
 		 1 - REVEAL_ATTR - Estado da carta (virado/desvirado/pareado)
-		 2 - GRAPHIC_UPDATE_STATUS - Força a atualização do estado da carta na tela
-
+		 2 - GRAPHIC_UPDATE_ATTR - Força a carta na tela a ser redesenhada
 	*/
 
 
@@ -81,7 +80,7 @@ void GerarParesAleatorios(char fieldSize,
 
 	 PosY - A coordenada Y das cartas no tabuleiro
 	 PosX - A coordenada X das cartas no tabuleiro
-	 Attr - Os attributos de cada carta, até agora [0] é o numero/imagen da carta e [1] é se ela esta virada ou não
+	 Attr - Os attributos de cada carta
 	 */
 
 	InitFieldMatrix(fieldSize, cardField); // Inicializa a matriz
