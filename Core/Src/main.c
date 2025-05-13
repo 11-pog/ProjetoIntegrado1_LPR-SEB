@@ -24,11 +24,7 @@
 /* USER CODE BEGIN Includes */
 #include <stdio.h>
 
-#include "ST7789/fonts.h"
 #include "ST7789/st7789.h"
-
-#include "StarCode_O_despertarDaFuncao/ImagensOfTheGame.h"
-#include "StarCode_O_despertarDaFuncao/ImagensOfTheGame.h"
 
 #include "StarCode_O_despertarDaFuncao/FuncoeszinhasDoSirAndery.h"
 #include "StarCode_O_despertarDaFuncao/Funcoes.h"
@@ -97,7 +93,7 @@ int main(void) {
 	MX_SPI1_Init();
 	/* USER CODE BEGIN 2 */
 	ST7789_Init();
-	GameRecord = 0; // Init record variable
+	GameRecord = 0; // Inicializa GameRecord = 0
 
 	/* USER CODE END 2 */
 

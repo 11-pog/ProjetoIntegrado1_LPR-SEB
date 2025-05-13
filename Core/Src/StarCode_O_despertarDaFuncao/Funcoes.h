@@ -105,32 +105,12 @@ void Pair(size_t size, char field[size][size][3], uint8_t x, uint8_t y);
 void SwitchTurn(void);
 void ShowTurn(void);
 
-// Testes
-void TestPrint(size_t fieldSize, char field[fieldSize][fieldSize][3]);
-
 // Other/Util
 char IsUnpaired(char card[3]);
 char Contains(size_t size, char Iterable[size], char Contains);
 char ContainsVector2(size_t size, char Iterable[size][size][3], char Contains, uint8_t attr);
 
-// Pedro piadas
-typedef uint16_t ceru;
-typedef uint8_t alu;
-typedef uint64_t ex;
-
-// Pokemon
-char mander(void);
-char meleon(void);
-char izard(void);
-char cadet(void);
-ceru ledge(void);
-int elion(void);
-float zel(void);
-alu card(void);
-ex calibur(void);
-
-// que(rosene)
-int ernet(void);
-bool AAAAAAAA(void);
+// Testes
+void TestPrint(size_t fieldSize, char field[fieldSize][fieldSize][3]);
 
 #endif
